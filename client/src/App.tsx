@@ -8,6 +8,8 @@ import Home from "@/pages/home";
 import Generator from "@/pages/generator";
 import PackDetail from "@/pages/pack-detail";
 import ImageView from "@/pages/image-view";
+import Gallery from "@/pages/gallery";
+import Premium from "@/pages/premium";
 
 function Router() {
   return (
@@ -16,6 +18,8 @@ function Router() {
       <Route path="/generate" component={Generator}/>
       <Route path="/pack/:id" component={PackDetail}/>
       <Route path="/view/:id" component={ImageView}/>
+      <Route path="/gallery" component={Gallery}/>
+      <Route path="/premium" component={Premium}/>
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
