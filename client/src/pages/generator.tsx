@@ -21,11 +21,8 @@ export default function Generator() {
 
   const generateMutation = useMutation({
     mutationFn: async (prompt: string) => {
-      return await apiRequest("/api/generate", {
-        method: "POST",
-        body: JSON.stringify({ prompt }),
-        headers: { "Content-Type": "application/json" },
-      });
+      const res = await apiRequest("POST", "/api/generate", { prompt });
+      return await res.json();
     },
     onSuccess: (data: any) => {
       setResultImage(data.imageUrl);
