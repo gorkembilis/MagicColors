@@ -1,9 +1,11 @@
 import { Link, useLocation } from "wouter";
 import { Home, Wand2, Crown, Image as ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n";
 
 export function BottomNav() {
   const [location] = useLocation();
+  const { t } = useI18n();
 
   const isActive = (path: string) => {
     return location === path || (path !== "/" && location.startsWith(path));
@@ -18,7 +20,7 @@ export function BottomNav() {
             isActive("/") && location === "/" ? "text-primary" : "text-muted-foreground hover:text-primary/70"
           )}>
             <Home className={cn("h-6 w-6", isActive("/") && location === "/" && "fill-current")} />
-            <span className="text-[10px] font-bold">Home</span>
+            <span className="text-[10px] font-bold">{t('nav.home')}</span>
           </a>
         </Link>
 
@@ -33,7 +35,7 @@ export function BottomNav() {
             )}>
               <Wand2 className={cn("h-6 w-6", isActive("/generate") && "text-primary")} />
             </div>
-            <span className="text-[10px] font-bold">Create</span>
+            <span className="text-[10px] font-bold">{t('nav.create')}</span>
           </a>
         </Link>
 
@@ -43,7 +45,7 @@ export function BottomNav() {
             isActive("/gallery") ? "text-primary" : "text-muted-foreground hover:text-primary/70"
           )}>
             <ImageIcon className={cn("h-6 w-6", isActive("/gallery") && "fill-current")} />
-            <span className="text-[10px] font-bold">My Art</span>
+            <span className="text-[10px] font-bold">{t('nav.gallery')}</span>
           </a>
         </Link>
 
@@ -53,7 +55,7 @@ export function BottomNav() {
             isActive("/premium") ? "text-secondary" : "text-muted-foreground hover:text-secondary/70"
           )}>
             <Crown className={cn("h-6 w-6", isActive("/premium") && "fill-current")} />
-            <span className="text-[10px] font-bold">Premium</span>
+            <span className="text-[10px] font-bold">{t('nav.premium')}</span>
           </a>
         </Link>
       </div>

@@ -7,18 +7,20 @@ import { ArrowLeft, Lock, Printer, Crown } from "lucide-react";
 import { motion } from "framer-motion";
 import NotFound from "@/pages/not-found";
 import { PremiumModal } from "@/components/premium-modal";
+import { useI18n } from "@/lib/i18n";
 
 export default function PackDetail() {
   const [, params] = useRoute("/pack/:id");
   const packId = params?.id;
   const pack = packs.find(p => p.id === packId);
+  const { t } = useI18n();
 
   if (!pack) return <NotFound />;
 
   const images = Array.from({ length: pack.count }).map((_, i) => ({
     id: `${pack.id}-${i + 1}`,
     url: pack.cover,
-    title: `${pack.title} #${i + 1}`
+    title: `${t(`pack.${pack.id}`)} #${i + 1}`
   }));
 
   const isLocked = pack.isPremium; 
@@ -40,7 +42,7 @@ export default function PackDetail() {
 
   return (
     <MobileLayout 
-      headerTitle={pack.title}
+      headerTitle={t(`pack.${pack.id}`)}
       headerAction={
         <Link href="/">
            <Button variant="ghost" size="icon" className="-mr-2">
@@ -53,7 +55,7 @@ export default function PackDetail() {
         <div className="mb-6">
           <Link href="/">
             <Button variant="ghost" size="sm" className="mb-4 pl-0 text-muted-foreground">
-              <ArrowLeft className="mr-2 h-4 w-4" /> Back
+              <ArrowLeft className="mr-2 h-4 w-4" /> {t('pack.back')}
             </Button>
           </Link>
 
@@ -63,12 +65,12 @@ export default function PackDetail() {
                 <Crown className="h-4 w-4" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="font-bold text-foreground text-sm">Premium Pack</p>
-                <p className="text-[10px] text-muted-foreground truncate">Unlock all {pack.count} pages</p>
+                <p className="font-bold text-foreground text-sm">{t('pack.premiumLabel')}</p>
+                <p className="text-[10px] text-muted-foreground truncate">{t('pack.premiumDesc')}</p>
               </div>
               <PremiumModal>
                 <Button size="sm" className="bg-secondary text-secondary-foreground hover:bg-secondary/90 font-bold rounded-full px-3 h-8 text-xs">
-                  Unlock
+                  {t('pack.unlock')}
                 </Button>
               </PremiumModal>
             </Card>

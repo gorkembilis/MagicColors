@@ -5,13 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { packs } from "@/lib/mock-data";
-import { Wand2, Lock, ArrowRight } from "lucide-react";
+import { Wand2, Lock, ArrowRight, Globe } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { motion } from "framer-motion";
+import { useI18n } from "@/lib/i18n";
 
 export default function Home() {
   const [, setLocation] = useLocation();
   const [prompt, setPrompt] = useState("");
+  const { t, language, setLanguage } = useI18n();
 
   const handleGenerate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,8 +37,18 @@ export default function Home() {
     show: { y: 0, opacity: 1 }
   };
 
+  const toggleLanguage = () => {
+    setLanguage(language === 'en' ? 'tr' : 'en');
+  };
+
   return (
-    <MobileLayout>
+    <MobileLayout 
+      headerAction={
+        <Button variant="ghost" size="sm" onClick={toggleLanguage} className="h-8 px-2 text-xs font-bold border border-border">
+          <Globe className="mr-1 h-3 w-3" /> {language.toUpperCase()}
+        </Button>
+      }
+    >
       {/* Hero Section */}
       <section className="relative overflow-hidden px-4 pt-8 pb-12">
         <div className="text-center relative z-10">
@@ -46,9 +58,9 @@ export default function Home() {
             transition={{ duration: 0.5 }}
           >
             <h1 className="mb-4 text-3xl font-extrabold leading-tight tracking-tight text-foreground">
-              Create Your Own <br />
+              {t('home.hero.title')} <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-purple-500 to-accent">
-                Coloring Pages
+                {t('home.hero.subtitle')}
               </span>
             </h1>
           </motion.div>
@@ -68,7 +80,7 @@ export default function Home() {
                 <Input 
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="Unicorn on the moon..." 
+                  placeholder={t('home.hero.placeholder')}
                   className="h-14 rounded-2xl border-2 border-border bg-white pl-12 pr-4 text-lg shadow-sm transition-all focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20"
                 />
                </div>
@@ -77,7 +89,7 @@ export default function Home() {
                 size="lg" 
                 className="w-full h-14 rounded-2xl bg-primary font-bold text-lg hover:bg-primary/90 shadow-md"
               >
-                Create Magic ✨
+                {t('home.hero.button')}
               </Button>
             </div>
           </motion.form>
@@ -92,11 +104,11 @@ export default function Home() {
       <section className="px-4 pb-8">
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold">Explore Packs</h2>
-            <p className="text-xs text-muted-foreground">Ready-to-print collections</p>
+            <h2 className="text-xl font-bold">{t('home.packs.title')}</h2>
+            <p className="text-xs text-muted-foreground">{t('home.packs.subtitle')}</p>
           </div>
           <Button variant="ghost" size="sm" className="h-8 text-xs font-bold text-primary px-2">
-            View All <ArrowRight className="ml-1 h-3 w-3" />
+            {t('home.packs.viewAll')} <ArrowRight className="ml-1 h-3 w-3" />
           </Button>
         </div>
 
@@ -123,13 +135,13 @@ export default function Home() {
                     )}
                     {!pack.isPremium && (
                       <div className="absolute right-2 top-2 rounded-full bg-secondary px-2 py-0.5 text-[10px] font-bold text-secondary-foreground shadow-sm">
-                        FREE
+                        {t('home.packs.free')}
                       </div>
                     )}
                   </div>
                   <CardContent className="p-3">
-                    <h3 className="mb-0.5 text-sm font-bold leading-none truncate">{pack.title}</h3>
-                    <p className="text-[10px] text-muted-foreground">{pack.count} pages</p>
+                    <h3 className="mb-0.5 text-sm font-bold leading-none truncate">{t(`pack.${pack.id}`)}</h3>
+                    <p className="text-[10px] text-muted-foreground">{pack.count} {t('home.packs.pages')}</p>
                   </CardContent>
                 </Card>
               </Link>

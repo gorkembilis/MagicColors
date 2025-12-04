@@ -6,9 +6,11 @@ import { ArrowLeft, Printer, Download, Share2, X } from "lucide-react";
 import { motion } from "framer-motion";
 import NotFound from "@/pages/not-found";
 import { useState } from "react";
+import { useI18n } from "@/lib/i18n";
 
 function AdBanner() {
   const [visible, setVisible] = useState(true);
+  const { t } = useI18n();
   if (!visible) return null;
   
   return (
@@ -19,7 +21,7 @@ function AdBanner() {
       >
         <X className="h-3 w-3" />
       </button>
-      <p className="text-[10px] font-bold text-gray-500 mb-1">ADVERTISEMENT</p>
+      <p className="text-[10px] font-bold text-gray-500 mb-1">{t('view.ad.label')}</p>
       <div className="h-12 bg-white w-full flex items-center justify-center text-gray-400 border border-dashed border-gray-300 rounded text-xs">
         Toy Advertisement
       </div>
@@ -30,6 +32,7 @@ function AdBanner() {
 export default function ImageView() {
   const [, params] = useRoute("/view/:id");
   const imageId = params?.id;
+  const { t } = useI18n();
   
   const packId = imageId?.split("-")[0];
   const pack = packs.find(p => p.id === packId);
@@ -37,7 +40,7 @@ export default function ImageView() {
   if (!imageId || !pack) return <NotFound />;
 
   const imageUrl = pack.cover; 
-  const title = `${pack.title} - Page ${imageId.split("-")[1]}`;
+  const title = `${t(`pack.${pack.id}`)} - Page ${imageId.split("-")[1]}`;
 
   const handlePrint = () => {
     window.print();
@@ -83,14 +86,14 @@ export default function ImageView() {
                 className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 text-lg font-bold shadow-lg"
                 onClick={handlePrint}
               >
-                <Printer className="mr-2 h-5 w-5" /> Print
+                <Printer className="mr-2 h-5 w-5" /> {t('view.printNow')}
               </Button>
               <Button 
                 size="lg" 
                 variant="outline" 
                 className="w-full h-14 rounded-2xl border-2 text-lg font-bold"
               >
-                <Download className="mr-2 h-5 w-5" /> PDF
+                <Download className="mr-2 h-5 w-5" /> {t('view.downloadPdf')}
               </Button>
           </div>
         </div>

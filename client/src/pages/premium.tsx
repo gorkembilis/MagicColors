@@ -2,10 +2,12 @@ import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Button } from "@/components/ui/button";
 import { Crown, Check, Star, Sparkles } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { useI18n } from "@/lib/i18n";
 
 export default function Premium() {
+  const { t } = useI18n();
   return (
-    <MobileLayout headerTitle="Premium Access">
+    <MobileLayout headerTitle={t('premium.title')}>
       <div className="p-4 pb-8">
         {/* Header Banner */}
         <div className="rounded-3xl bg-gradient-to-br from-secondary via-orange-400 to-pink-500 p-6 text-white shadow-lg mb-6 relative overflow-hidden">
@@ -16,30 +18,30 @@ export default function Premium() {
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm shadow-inner border border-white/30">
               <Crown className="h-8 w-8 text-white" />
             </div>
-            <h1 className="text-2xl font-extrabold mb-2">Unlock Everything</h1>
+            <h1 className="text-2xl font-extrabold mb-2">{t('premium.banner.title')}</h1>
             <p className="text-white/90 text-sm font-medium mb-6">
-              Get unlimited access to all packs, AI tools, and remove all ads.
+              {t('premium.banner.desc')}
             </p>
             <Button className="w-full bg-white text-secondary font-extrabold rounded-xl h-12 shadow-lg hover:bg-white/90">
-              Start 7-Day Free Trial
+              {t('premium.trial')}
             </Button>
             <p className="mt-3 text-[10px] text-white/70">
-              Then $4.99/month. Cancel anytime.
+              {t('premium.price')}
             </p>
           </div>
         </div>
 
         {/* Features */}
         <div className="space-y-4 mb-8">
-          <h3 className="font-bold text-lg px-2">Why Go Premium?</h3>
+          <h3 className="font-bold text-lg px-2">{t('nav.premium')}</h3>
           
           <Card className="p-4 border-none shadow-sm flex items-center gap-4 bg-white">
             <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
               <Sparkles className="h-6 w-6" />
             </div>
             <div>
-              <h4 className="font-bold">Unlimited AI Creation</h4>
-              <p className="text-xs text-muted-foreground">Create as many custom pages as you want.</p>
+              <h4 className="font-bold">{t('premium.feat.ai')}</h4>
+              <p className="text-xs text-muted-foreground">{t('premium.feat.ai.desc')}</p>
             </div>
           </Card>
 
@@ -48,8 +50,8 @@ export default function Premium() {
               <Star className="h-6 w-6" />
             </div>
             <div>
-              <h4 className="font-bold">Unlock All Packs</h4>
-              <p className="text-xs text-muted-foreground">Princesses, Space, Superheroes & more.</p>
+              <h4 className="font-bold">{t('premium.feat.packs')}</h4>
+              <p className="text-xs text-muted-foreground">{t('premium.feat.packs.desc')}</p>
             </div>
           </Card>
 
@@ -58,8 +60,8 @@ export default function Premium() {
               <Check className="h-6 w-6" />
             </div>
             <div>
-              <h4 className="font-bold">No More Ads</h4>
-              <p className="text-xs text-muted-foreground">A completely distraction-free experience.</p>
+              <h4 className="font-bold">{t('premium.feat.ads')}</h4>
+              <p className="text-xs text-muted-foreground">{t('premium.feat.ads.desc')}</p>
             </div>
           </Card>
         </div>
@@ -67,7 +69,7 @@ export default function Premium() {
         {/* Restore Purchase */}
         <div className="text-center">
           <Button variant="ghost" size="sm" className="text-muted-foreground text-xs">
-            Restore Purchases
+            {t('premium.restore')}
           </Button>
         </div>
       </div>

@@ -5,11 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Download, Printer, Share2, ArrowLeft, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
+import { useI18n } from "@/lib/i18n";
 
 export default function Generator() {
   const [location, setLocation] = useLocation();
   const [status, setStatus] = useState<'generating' | 'complete'>('generating');
   const [progress, setProgress] = useState(0);
+  const { t } = useI18n();
   
   const params = new URLSearchParams(window.location.search);
   const prompt = params.get("prompt") || "A magical surprise";
@@ -41,7 +43,7 @@ export default function Generator() {
           className="self-start mb-4 pl-0 text-muted-foreground"
           onClick={() => setLocation("/")}
         >
-          <ArrowLeft className="mr-1 h-4 w-4" /> Back
+          <ArrowLeft className="mr-1 h-4 w-4" /> {t('generator.back')}
         </Button>
 
         <div className="flex-1 flex flex-col">
@@ -56,7 +58,7 @@ export default function Generator() {
                     <Sparkles className="h-10 w-10 animate-pulse text-primary" />
                   </div>
                 </div>
-                <h3 className="mb-2 text-xl font-bold text-primary animate-pulse">Creating Magic...</h3>
+                <h3 className="mb-2 text-xl font-bold text-primary animate-pulse">{t('generator.creating')}</h3>
                 
                 <div className="mt-6 w-full max-w-[200px]">
                   <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
@@ -92,15 +94,15 @@ export default function Generator() {
               >
                 <div className="grid grid-cols-2 gap-3">
                   <Button size="lg" className="w-full h-12 rounded-xl font-bold" variant="outline">
-                    <Download className="h-4 w-4 mr-2" /> Save PDF
+                    <Download className="h-4 w-4 mr-2" /> {t('generator.savePdf')}
                   </Button>
                   <Button size="lg" className="w-full h-12 rounded-xl font-bold bg-secondary hover:bg-secondary/90 text-secondary-foreground">
-                    <Printer className="h-4 w-4 mr-2" /> Print
+                    <Printer className="h-4 w-4 mr-2" /> {t('generator.print')}
                   </Button>
                 </div>
                 
                 <Button size="lg" variant="ghost" className="w-full h-12 font-bold text-muted-foreground">
-                  <Share2 className="h-4 w-4 mr-2" /> Share
+                  <Share2 className="h-4 w-4 mr-2" /> {t('generator.share')}
                 </Button>
 
                 <Button 
@@ -109,7 +111,7 @@ export default function Generator() {
                   className="w-full mt-4 rounded-lg bg-muted text-muted-foreground h-10"
                   onClick={() => setStatus('generating')}
                 >
-                  Try Again (Regenerate)
+                  {t('generator.tryAgain')}
                 </Button>
               </motion.div>
             )}
