@@ -1,4 +1,6 @@
-const API_BASE_URL = 'https://YOUR_REPLIT_URL'; // Bu URL'yi güncelleyin
+import Constants from 'expo-constants';
+
+const API_BASE_URL = Constants.expoConfig?.extra?.apiBaseUrl || 'https://70d68d7f-33e2-44b4-b3f3-b98cbba23642-00-i724sanmu6da.kirk.replit.dev';
 
 export async function apiRequest(method: string, endpoint: string, data?: any) {
   const options: RequestInit = {
@@ -6,7 +8,6 @@ export async function apiRequest(method: string, endpoint: string, data?: any) {
     headers: {
       'Content-Type': 'application/json',
     },
-    credentials: 'include',
   };
 
   if (data) {
