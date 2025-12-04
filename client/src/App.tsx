@@ -11,12 +11,14 @@ import PackDetail from "@/pages/pack-detail";
 import ImageView from "@/pages/image-view";
 import Gallery from "@/pages/gallery";
 import Premium from "@/pages/premium";
+import Auth from "@/pages/auth";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Home}/>
       <Route path="/generate" component={Generator}/>
+      <Route path="/auth" component={Auth}/>
       <Route path="/pack/:id" component={PackDetail}/>
       <Route path="/view/:id" component={ImageView}/>
       <Route path="/gallery" component={Gallery}/>

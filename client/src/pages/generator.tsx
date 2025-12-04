@@ -51,7 +51,7 @@ export default function Generator() {
   };
 
   const handleLogin = () => {
-    window.location.href = "/api/login";
+    setLocation("/auth");
   };
 
   const isGenerating = generateMutation.isPending;
