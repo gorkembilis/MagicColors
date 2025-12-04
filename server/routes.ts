@@ -1,8 +1,21 @@
-import type { Express } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./auth";
 import { generateColoringPage } from "./gemini";
+
+const isAdmin = async (req: any, res: Response, next: NextFunction) => {
+  if (!req.session?.userId) {
+    return res.status(401).json({ message: "Yetkisiz erişim" });
+  }
+  
+  const user = await storage.getUser(req.session.userId);
+  if (!user?.isAdmin) {
+    return res.status(403).json({ message: "Yönetici yetkisi gerekli" });
+  }
+  
+  next();
+};
 
 export async function registerRoutes(
   httpServer: Server,
@@ -23,6 +36,7 @@ export async function registerRoutes(
         firstName: user.firstName,
         lastName: user.lastName,
         isPremium: user.isPremium,
+        isAdmin: user.isAdmin,
         profileImageUrl: user.profileImageUrl,
       });
     } catch (error) {
@@ -63,6 +77,99 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error fetching user images:", error);
       res.status(500).json({ message: "Failed to fetch images" });
+    }
+  });
+
+  app.get("/api/admin/stats", isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const stats = await storage.getStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+      res.status(500).json({ message: "İstatistikler alınamadı" });
+    }
+  });
+
+  app.get("/api/admin/users", isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      res.json(users.map(u => ({
+        id: u.id,
+        email: u.email,
+        firstName: u.firstName,
+        lastName: u.lastName,
+        isPremium: u.isPremium,
+        isAdmin: u.isAdmin,
+        createdAt: u.createdAt,
+      })));
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({ message: "Kullanıcılar alınamadı" });
+    }
+  });
+
+  app.patch("/api/admin/users/:id", isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { isPremium, isAdmin: makeAdmin } = req.body;
+      
+      const updates: any = {};
+      if (typeof isPremium === "boolean") updates.isPremium = isPremium;
+      if (typeof makeAdmin === "boolean") updates.isAdmin = makeAdmin;
+      
+      const user = await storage.updateUser(id, updates);
+      if (!user) {
+        return res.status(404).json({ message: "Kullanıcı bulunamadı" });
+      }
+      
+      res.json({
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        isPremium: user.isPremium,
+        isAdmin: user.isAdmin,
+      });
+    } catch (error) {
+      console.error("Error updating user:", error);
+      res.status(500).json({ message: "Kullanıcı güncellenemedi" });
+    }
+  });
+
+  app.delete("/api/admin/users/:id", isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      
+      if (id === req.session.userId) {
+        return res.status(400).json({ message: "Kendinizi silemezsiniz" });
+      }
+      
+      await storage.deleteUser(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      res.status(500).json({ message: "Kullanıcı silinemedi" });
+    }
+  });
+
+  app.get("/api/admin/images", isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const images = await storage.getAllGeneratedImages();
+      res.json(images);
+    } catch (error) {
+      console.error("Error fetching images:", error);
+      res.status(500).json({ message: "Görüntüler alınamadı" });
+    }
+  });
+
+  app.delete("/api/admin/images/:id", isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteGeneratedImage(parseInt(id));
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting image:", error);
+      res.status(500).json({ message: "Görüntü silinemedi" });
     }
   });
 

@@ -21,6 +21,7 @@ export const users = pgTable("users", {
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
   isPremium: boolean("is_premium").notNull().default(false),
+  isAdmin: boolean("is_admin").notNull().default(false),
   premiumUntil: timestamp("premium_until"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),

@@ -7,7 +7,7 @@ import {
   type InsertGeneratedImage,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, count, sql } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -16,6 +16,13 @@ export interface IStorage {
   createUserWithPassword(email: string, passwordHash: string, firstName?: string, lastName?: string): Promise<User>;
   getUserGeneratedImages(userId: string): Promise<GeneratedImage[]>;
   createGeneratedImage(image: InsertGeneratedImage): Promise<GeneratedImage>;
+  
+  getAllUsers(): Promise<User[]>;
+  updateUser(id: string, data: Partial<User>): Promise<User | undefined>;
+  deleteUser(id: string): Promise<boolean>;
+  getAllGeneratedImages(): Promise<(GeneratedImage & { userEmail?: string | null })[]>;
+  deleteGeneratedImage(id: number): Promise<boolean>;
+  getStats(): Promise<{ totalUsers: number; totalImages: number; premiumUsers: number }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -78,6 +85,60 @@ export class DatabaseStorage implements IStorage {
       .values(imageData)
       .returning();
     return image;
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return await db.select().from(users).orderBy(desc(users.createdAt));
+  }
+
+  async updateUser(id: string, data: Partial<User>): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    return user;
+  }
+
+  async deleteUser(id: string): Promise<boolean> {
+    const result = await db.delete(users).where(eq(users.id, id));
+    return true;
+  }
+
+  async getAllGeneratedImages(): Promise<(GeneratedImage & { userEmail?: string | null })[]> {
+    const images = await db
+      .select({
+        id: generatedImages.id,
+        userId: generatedImages.userId,
+        prompt: generatedImages.prompt,
+        imageUrl: generatedImages.imageUrl,
+        createdAt: generatedImages.createdAt,
+        userEmail: users.email,
+      })
+      .from(generatedImages)
+      .leftJoin(users, eq(generatedImages.userId, users.id))
+      .orderBy(desc(generatedImages.createdAt));
+    return images;
+  }
+
+  async deleteGeneratedImage(id: number): Promise<boolean> {
+    await db.delete(generatedImages).where(eq(generatedImages.id, id));
+    return true;
+  }
+
+  async getStats(): Promise<{ totalUsers: number; totalImages: number; premiumUsers: number }> {
+    const [userCount] = await db.select({ count: count() }).from(users);
+    const [imageCount] = await db.select({ count: count() }).from(generatedImages);
+    const [premiumCount] = await db
+      .select({ count: count() })
+      .from(users)
+      .where(eq(users.isPremium, true));
+
+    return {
+      totalUsers: userCount?.count || 0,
+      totalImages: imageCount?.count || 0,
+      premiumUsers: premiumCount?.count || 0,
+    };
   }
 }
 
