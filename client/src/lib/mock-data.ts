@@ -41,6 +41,14 @@ import stegoImg from "@assets/generated_images/stegosaurus_coloring_page.png";
 import castleImg from "@assets/generated_images/princess_castle_coloring_page.png";
 import rocketImg from "@assets/generated_images/rocket_coloring_page.png";
 
+// Creatures (Pokemon-style)
+import creaturesCover from "@assets/generated_images/creatures_pack_cover.png";
+import creatureImg from "@assets/generated_images/cute_creature_coloring_page.png";
+
+// Superheroes
+import superheroCover from "@assets/generated_images/superhero_pack_cover.png";
+import superheroImg from "@assets/generated_images/superhero_coloring_page.png";
+
 export interface PackImage {
   id: string;
   url: string;
@@ -134,18 +142,18 @@ export const packs: Pack[] = [
   {
     id: "pokemon",
     title: "Poke-Style",
-    cover: "https://images.unsplash.com/photo-1613771404721-c5b425876d64?q=80&w=500&auto=format&fit=crop",
+    cover: creaturesCover,
     isPremium: true,
     count: 20,
-    images: createImages("pokemon", "Poke-Style", ["https://images.unsplash.com/photo-1613771404721-c5b425876d64?q=80&w=500&auto=format&fit=crop"], 20)
+    images: createImages("pokemon", "Poke-Style", [creatureImg, creaturesCover], 20)
   },
   {
     id: "superhero",
     title: "Super Heroes",
-    cover: "https://images.unsplash.com/photo-1568833450051-15f9b2a97908?q=80&w=500&auto=format&fit=crop",
+    cover: superheroCover,
     isPremium: true,
     count: 10,
-    images: createImages("superhero", "Super Heroes", ["https://images.unsplash.com/photo-1568833450051-15f9b2a97908?q=80&w=500&auto=format&fit=crop"], 10)
+    images: createImages("superhero", "Super Heroes", [superheroImg, superheroCover], 10)
   }
 ];
 
