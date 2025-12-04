@@ -75,6 +75,10 @@ const translations: Record<Language, Record<string, string>> = {
     "pack.space": "Space Explorer",
     "pack.pokemon": "Poke-Style",
     "pack.superhero": "Super Heroes",
+
+    "auth.loginRequired": "Login Required",
+    "auth.loginToCreate": "Please sign in to create your own magical coloring pages with AI.",
+    "auth.login": "Sign In",
   },
   tr: {
     "app.title": "SihirliRenkler",
@@ -142,6 +146,10 @@ const translations: Record<Language, Record<string, string>> = {
     "pack.space": "Uzay Kaşifi",
     "pack.pokemon": "Poke-Tarzı",
     "pack.superhero": "Süper Kahramanlar",
+
+    "auth.loginRequired": "Giriş Gerekli",
+    "auth.loginToCreate": "AI ile kendi sihirli boyama sayfalarını oluşturmak için lütfen giriş yap.",
+    "auth.login": "Giriş Yap",
   }
 };
 
