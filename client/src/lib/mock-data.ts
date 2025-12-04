@@ -1,9 +1,9 @@
-import animalsCover from "@assets/generated_images/cute_animals_coloring_pack_cover.png";
-import carsCover from "@assets/generated_images/cool_cars_coloring_pack_cover.png";
-import fruitsCover from "@assets/generated_images/cute_fruits_coloring_pack_cover.png";
-import dinosCover from "@assets/generated_images/cute_dinosaurs_coloring_pack_cover.png";
-import princessCover from "@assets/generated_images/princess_coloring_pack_cover.png";
-import spaceCover from "@assets/generated_images/space_coloring_pack_cover.png";
+import animalsCover from "@assets/generated_images/colorful_animals_cover.png";
+import carsCover from "@assets/generated_images/colorful_cars_cover.png";
+import fruitsCover from "@assets/generated_images/colorful_fruits_cover.png";
+import dinosCover from "@assets/generated_images/colorful_dinosaurs_cover.png";
+import princessCover from "@assets/generated_images/colorful_princess_cover.png";
+import spaceCover from "@assets/generated_images/colorful_space_cover.png";
 
 // Animals
 import lionImg from "@assets/generated_images/lion_coloring_page.png";
@@ -32,22 +32,32 @@ import planeImg from "@assets/generated_images/plane_coloring_page.png";
 // Fruits
 import appleImg from "@assets/generated_images/apple_coloring_page.png";
 import bananaImg from "@assets/generated_images/banana_coloring_page.png";
+import strawberryImg from "@assets/generated_images/strawberry_coloring_page.png";
+import orangeImg from "@assets/generated_images/orange_coloring_page.png";
 
 // Dinos
 import trexImg from "@assets/generated_images/trex_coloring_page.png";
 import stegoImg from "@assets/generated_images/stegosaurus_coloring_page.png";
+import triceratopsImg from "@assets/generated_images/triceratops_coloring_page.png";
+import brachiosaurusImg from "@assets/generated_images/brachiosaurus_coloring_page.png";
 
-// Others
+// Princess
 import castleImg from "@assets/generated_images/princess_castle_coloring_page.png";
+import princessImg from "@assets/generated_images/princess_coloring_page.png";
+
+// Space
 import rocketImg from "@assets/generated_images/rocket_coloring_page.png";
+import astronautImg from "@assets/generated_images/astronaut_coloring_page.png";
 
 // Creatures (Pokemon-style)
-import creaturesCover from "@assets/generated_images/creatures_pack_cover.png";
+import creaturesCover from "@assets/generated_images/colorful_creatures_cover.png";
 import creatureImg from "@assets/generated_images/cute_creature_coloring_page.png";
+import creature2Img from "@assets/generated_images/creature_2_coloring_page.png";
 
 // Superheroes
-import superheroCover from "@assets/generated_images/superhero_pack_cover.png";
+import superheroCover from "@assets/generated_images/colorful_superhero_cover.png";
 import superheroImg from "@assets/generated_images/superhero_coloring_page.png";
+import superheroGirlImg from "@assets/generated_images/superhero_girl_coloring_page.png";
 
 export interface PackImage {
   id: string;
@@ -113,7 +123,7 @@ export const packs: Pack[] = [
     cover: fruitsCover,
     isPremium: false,
     count: 10,
-    images: createImages("fruits", "Yummy Fruits", [appleImg, bananaImg, fruitsCover], 10)
+    images: createImages("fruits", "Yummy Fruits", [appleImg, bananaImg, strawberryImg, orangeImg], 10)
   },
   {
     id: "dinos",
@@ -121,7 +131,7 @@ export const packs: Pack[] = [
     cover: dinosCover,
     isPremium: false,
     count: 10,
-    images: createImages("dinos", "Dino World", [trexImg, stegoImg, dinosCover], 10)
+    images: createImages("dinos", "Dino World", [trexImg, stegoImg, triceratopsImg, brachiosaurusImg], 10)
   },
   {
     id: "princess",
@@ -129,7 +139,7 @@ export const packs: Pack[] = [
     cover: princessCover,
     isPremium: true,
     count: 15,
-    images: createImages("princess", "Princess Castle", [castleImg, princessCover], 15)
+    images: createImages("princess", "Princess Castle", [castleImg, princessImg], 15)
   },
   {
     id: "space",
@@ -137,7 +147,7 @@ export const packs: Pack[] = [
     cover: spaceCover,
     isPremium: true,
     count: 12,
-    images: createImages("space", "Space Explorer", [rocketImg, spaceCover], 12)
+    images: createImages("space", "Space Explorer", [rocketImg, astronautImg], 12)
   },
   {
     id: "pokemon",
@@ -145,7 +155,7 @@ export const packs: Pack[] = [
     cover: creaturesCover,
     isPremium: true,
     count: 20,
-    images: createImages("pokemon", "Poke-Style", [creatureImg, creaturesCover], 20)
+    images: createImages("pokemon", "Poke-Style", [creatureImg, creature2Img], 20)
   },
   {
     id: "superhero",
@@ -153,7 +163,7 @@ export const packs: Pack[] = [
     cover: superheroCover,
     isPremium: true,
     count: 10,
-    images: createImages("superhero", "Super Heroes", [superheroImg, superheroCover], 10)
+    images: createImages("superhero", "Super Heroes", [superheroImg, superheroGirlImg], 10)
   }
 ];
 
