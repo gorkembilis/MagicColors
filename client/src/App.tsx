@@ -12,6 +12,7 @@ import ImageView from "@/pages/image-view";
 import Gallery from "@/pages/gallery";
 import Premium from "@/pages/premium";
 import Auth from "@/pages/auth";
+import Admin from "@/pages/admin";
 
 function Router() {
   return (
@@ -19,6 +20,7 @@ function Router() {
       <Route path="/" component={Home}/>
       <Route path="/generate" component={Generator}/>
       <Route path="/auth" component={Auth}/>
+      <Route path="/admin" component={Admin}/>
       <Route path="/pack/:id" component={PackDetail}/>
       <Route path="/view/:id" component={ImageView}/>
       <Route path="/gallery" component={Gallery}/>

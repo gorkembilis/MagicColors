@@ -4,11 +4,16 @@
 
 MagicColors is a web application that allows users to create custom AI-generated coloring pages for children. The application provides both curated coloring page packs and an AI-powered generator that creates unique, child-friendly line-art images based on user prompts. Users can browse pre-made packs, generate custom pages, save their creations to a gallery, and print or download PDFs.
 
-The application features a mobile-first design optimized for parents and children, with internationalization support (English/Turkish), a premium tier system, and Replit authentication integration.
+The application features a mobile-first design optimized for parents and children, with internationalization support (English/Turkish), a premium tier system, and in-app email/password authentication.
 
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+
+## Recent Changes
+
+- **Admin Dashboard** (December 2024): Added comprehensive admin panel at `/admin` for managing users, viewing statistics, and managing generated images
+- **In-App Authentication** (December 2024): Replaced Replit Auth with custom email/password authentication system to avoid external redirects
 
 ## System Architecture
 
@@ -40,11 +45,13 @@ Preferred communication style: Simple, everyday language.
 
 **Routing Structure**
 - `/` - Home page with hero, prompt input, and pack previews
+- `/auth` - Login and registration page
 - `/generate` - AI generation page with loading states and result display
 - `/pack/:id` - Pack detail page showing all images in a collection
 - `/view/:id` - Individual image view with print/download options
 - `/gallery` - User's saved AI-generated images
 - `/premium` - Premium tier upsell page
+- `/admin` - Admin dashboard (requires admin role)
 
 ### Backend Architecture
 
@@ -59,20 +66,30 @@ Preferred communication style: Simple, everyday language.
 - Build process bundles server code with esbuild for faster cold starts
 
 **Authentication & Session Management**
-- **Replit Auth** via OpenID Connect (OIDC) with Passport.js
+- **Custom email/password authentication** with bcrypt password hashing
 - **Express Session** with PostgreSQL session store (`connect-pg-simple`)
 - Session TTL: 7 days with HTTP-only, secure cookies
 - Custom `isAuthenticated` middleware for protected routes
+- Custom `isAdmin` middleware for admin-only routes
 
 **API Endpoints**
+- `POST /api/auth/register` - Register new user with email/password
+- `POST /api/auth/login` - Login with email/password
+- `POST /api/auth/logout` - Logout and destroy session
 - `GET /api/auth/user` - Fetch authenticated user profile
 - `POST /api/generate` - Generate AI coloring page from prompt
 - `GET /api/my-art` - Retrieve user's generated images
-- Authentication flow handled via Replit OIDC integration
+- **Admin Endpoints:**
+  - `GET /api/admin/stats` - Get application statistics
+  - `GET /api/admin/users` - List all users
+  - `PATCH /api/admin/users/:id` - Update user (premium/admin status)
+  - `DELETE /api/admin/users/:id` - Delete user
+  - `GET /api/admin/images` - List all generated images
+  - `DELETE /api/admin/images/:id` - Delete image
 
 **Storage Layer**
 - `DatabaseStorage` class implementing `IStorage` interface
-- Methods for user management and image tracking
+- Methods for user management, image tracking, and admin operations
 - All database operations use Drizzle ORM
 
 ### Database Architecture
@@ -90,10 +107,12 @@ Preferred communication style: Simple, everyday language.
    - `sess` (JSONB session data)
    - `expire` (timestamp with index for cleanup)
 
-2. **users** - User profiles from Replit Auth
+2. **users** - User profiles
    - `id` (UUID primary key)
-   - `email`, `firstName`, `lastName`, `profileImageUrl`
+   - `email` (unique), `passwordHash`
+   - `firstName`, `lastName`, `profileImageUrl`
    - `isPremium` (boolean, default false)
+   - `isAdmin` (boolean, default false)
    - `premiumUntil` (timestamp)
    - `createdAt`, `updatedAt` timestamps
 
@@ -137,18 +156,12 @@ Preferred communication style: Simple, everyday language.
 
 ### Third-Party Services
 
-1. **Replit Platform**
-   - OIDC authentication (`ISSUER_URL`, `REPL_ID`)
-   - Deployment environment detection
-   - Session secret management (`SESSION_SECRET`)
-   - Vite plugins for development: cartographer, dev-banner, runtime-error-modal
-
-2. **Google Gemini AI**
+1. **Google Gemini AI**
    - Generative AI API for image creation
    - Multimodal output (text + image)
    - Environment: `AI_INTEGRATIONS_GEMINI_API_KEY`, `AI_INTEGRATIONS_GEMINI_BASE_URL`
 
-3. **PostgreSQL Database**
+2. **PostgreSQL Database**
    - Connection via `DATABASE_URL` environment variable
    - Used for user data, sessions, and generated images
    - Connection pooling with `pg` library
@@ -159,7 +172,7 @@ Preferred communication style: Simple, everyday language.
 - `@google/genai` - Google Gemini AI SDK
 - `drizzle-orm` - Type-safe ORM
 - `express` - Web server framework
-- `passport`, `openid-client` - Authentication
+- `bcryptjs` - Password hashing
 - `pg` - PostgreSQL client
 - `zod` - Schema validation
 - `@tanstack/react-query` - Server state management
@@ -196,8 +209,6 @@ Preferred communication style: Simple, everyday language.
 **Environment Variables Required**
 - `DATABASE_URL` - PostgreSQL connection string
 - `SESSION_SECRET` - Express session encryption key
-- `ISSUER_URL` - Replit OIDC issuer
-- `REPL_ID` - Replit application ID
 - `AI_INTEGRATIONS_GEMINI_API_KEY` - Gemini API key
 - `AI_INTEGRATIONS_GEMINI_BASE_URL` - Gemini API endpoint
 - `NODE_ENV` - Environment flag (development/production)
