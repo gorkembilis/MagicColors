@@ -1,18 +1,28 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, boolean, integer, serial } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, boolean, integer, serial, jsonb, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+export const sessions = pgTable(
+  "sessions",
+  {
+    sid: varchar("sid").primaryKey(),
+    sess: jsonb("sess").notNull(),
+    expire: timestamp("expire").notNull(),
+  },
+  (table) => [index("IDX_session_expire").on(table.expire)],
+);
+
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  replitId: text("replit_id").unique(),
-  username: text("username").notNull().unique(),
-  password: text("password"),
-  email: text("email"),
-  avatarUrl: text("avatar_url"),
+  email: varchar("email"),
+  firstName: varchar("first_name"),
+  lastName: varchar("last_name"),
+  profileImageUrl: varchar("profile_image_url"),
   isPremium: boolean("is_premium").notNull().default(false),
   premiumUntil: timestamp("premium_until"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export const generatedImages = pgTable("generated_images", {
@@ -26,6 +36,7 @@ export const generatedImages = pgTable("generated_images", {
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
+  updatedAt: true,
 });
 
 export const insertGeneratedImageSchema = createInsertSchema(generatedImages).omit({
@@ -33,6 +44,7 @@ export const insertGeneratedImageSchema = createInsertSchema(generatedImages).om
   createdAt: true,
 });
 
+export type UpsertUser = typeof users.$inferInsert;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type GeneratedImage = typeof generatedImages.$inferSelect;
