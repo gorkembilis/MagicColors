@@ -1,9 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupAuth, isAuthenticated } from "./auth";
 import { generateColoringPage } from "./gemini";
-import { insertGeneratedImageSchema } from "@shared/schema";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -13,9 +12,19 @@ export async function registerRoutes(
 
   app.get("/api/auth/user", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId;
       const user = await storage.getUser(userId);
-      res.json(user);
+      if (!user) {
+        return res.status(404).json({ message: "Kullanıcı bulunamadı" });
+      }
+      res.json({
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        isPremium: user.isPremium,
+        profileImageUrl: user.profileImageUrl,
+      });
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
@@ -24,7 +33,7 @@ export async function registerRoutes(
 
   app.post("/api/generate", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId;
       const { prompt } = req.body;
 
       if (!prompt || typeof prompt !== "string") {
@@ -48,7 +57,7 @@ export async function registerRoutes(
 
   app.get("/api/my-art", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId;
       const images = await storage.getUserGeneratedImages(userId);
       res.json(images);
     } catch (error) {
