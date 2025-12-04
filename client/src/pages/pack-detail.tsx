@@ -17,11 +17,7 @@ export default function PackDetail() {
 
   if (!pack) return <NotFound />;
 
-  const images = Array.from({ length: pack.count }).map((_, i) => ({
-    id: `${pack.id}-${i + 1}`,
-    url: pack.cover,
-    title: `${t(`pack.${pack.id}`)} #${i + 1}`
-  }));
+  const images = pack.images;
 
   const isLocked = pack.isPremium; 
 

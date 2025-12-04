@@ -39,7 +39,10 @@ export default function ImageView() {
   
   if (!imageId || !pack) return <NotFound />;
 
-  const imageUrl = pack.cover; 
+  const image = pack.images.find(img => img.id === imageId);
+  if (!image) return <NotFound />;
+
+  const imageUrl = image.url; 
   const title = `${t(`pack.${pack.id}`)} - Page ${imageId.split("-")[1]}`;
 
   const handlePrint = () => {
