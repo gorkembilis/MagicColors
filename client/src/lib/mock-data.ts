@@ -59,6 +59,38 @@ import superheroCover from "@assets/generated_images/colorful_superhero_cover.pn
 import superheroImg from "@assets/generated_images/superhero_coloring_page.png";
 import superheroGirlImg from "@assets/generated_images/superhero_girl_coloring_page.png";
 
+// Sea Creatures
+import seaCreaturesCover from "@assets/generated_images/sea_creatures_coloring_cover.png";
+import dolphinImg from "@assets/generated_images/dolphin_coloring_page.png";
+import octopusImg from "@assets/generated_images/octopus_coloring_page.png";
+import fishImg from "@assets/generated_images/fish_coloring_page.png";
+import jellyfishImg from "@assets/generated_images/jellyfish_coloring_page.png";
+import seaTurtleImg from "@assets/generated_images/sea_turtle_coloring_page.png";
+
+// Birds
+import birdsCover from "@assets/generated_images/birds_coloring_book_cover.png";
+import parrotImg from "@assets/generated_images/parrot_coloring_page.png";
+import owlImg from "@assets/generated_images/owl_coloring_page.png";
+import flamingoImg from "@assets/generated_images/flamingo_coloring_page.png";
+import peacockImg from "@assets/generated_images/peacock_coloring_page.png";
+import penguinImg from "@assets/generated_images/penguin_coloring_page.png";
+
+// Sports
+import sportsCover from "@assets/generated_images/sports_coloring_book_cover.png";
+import soccerImg from "@assets/generated_images/soccer_ball_coloring_page.png";
+import basketballImg from "@assets/generated_images/basketball_coloring_page.png";
+import swimmingImg from "@assets/generated_images/swimming_coloring_page.png";
+import bicycleImg from "@assets/generated_images/bicycle_coloring_page.png";
+import tennisImg from "@assets/generated_images/tennis_coloring_page.png";
+
+// Music
+import musicCover from "@assets/generated_images/music_coloring_book_cover.png";
+import guitarImg from "@assets/generated_images/guitar_coloring_page.png";
+import pianoImg from "@assets/generated_images/piano_coloring_page.png";
+import drumsImg from "@assets/generated_images/drums_coloring_page.png";
+import violinImg from "@assets/generated_images/violin_coloring_page.png";
+import trumpetImg from "@assets/generated_images/trumpet_coloring_page.png";
+
 export interface PackImage {
   id: string;
   url: string;
@@ -164,6 +196,46 @@ export const packs: Pack[] = [
     isPremium: true,
     count: 10,
     images: createImages("superhero", "Super Heroes", [superheroImg, superheroGirlImg], 10)
+  },
+  {
+    id: "seacreatures",
+    title: "Sea Creatures",
+    cover: seaCreaturesCover,
+    isPremium: false,
+    count: 10,
+    images: createImages("seacreatures", "Sea Creatures", [
+      dolphinImg, octopusImg, fishImg, jellyfishImg, seaTurtleImg
+    ], 10)
+  },
+  {
+    id: "birds",
+    title: "Birds",
+    cover: birdsCover,
+    isPremium: false,
+    count: 10,
+    images: createImages("birds", "Birds", [
+      parrotImg, owlImg, flamingoImg, peacockImg, penguinImg
+    ], 10)
+  },
+  {
+    id: "sports",
+    title: "Sports",
+    cover: sportsCover,
+    isPremium: true,
+    count: 10,
+    images: createImages("sports", "Sports", [
+      soccerImg, basketballImg, swimmingImg, bicycleImg, tennisImg
+    ], 10)
+  },
+  {
+    id: "music",
+    title: "Music",
+    cover: musicCover,
+    isPremium: true,
+    count: 10,
+    images: createImages("music", "Music", [
+      guitarImg, pianoImg, drumsImg, violinImg, trumpetImg
+    ], 10)
   }
 ];
 

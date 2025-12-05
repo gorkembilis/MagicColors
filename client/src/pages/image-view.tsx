@@ -1,8 +1,8 @@
-import { useRoute, Link } from "wouter";
+import { useRoute, Link, useLocation } from "wouter";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Button } from "@/components/ui/button";
 import { packs } from "@/lib/mock-data";
-import { ArrowLeft, Printer, Download, Share2, X } from "lucide-react";
+import { ArrowLeft, Printer, Download, Share2, X, Palette } from "lucide-react";
 import { motion } from "framer-motion";
 import NotFound from "@/pages/not-found";
 import { useState } from "react";
@@ -31,6 +31,7 @@ function AdBanner() {
 
 export default function ImageView() {
   const [, params] = useRoute("/view/:id");
+  const [, setLocation] = useLocation();
   const imageId = params?.id;
   const { t } = useI18n();
   
@@ -83,11 +84,22 @@ export default function ImageView() {
           
           {!pack.isPremium && <div className="mb-4"><AdBanner /></div>}
 
+          <Button 
+            size="lg" 
+            className="w-full h-14 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-lg font-bold shadow-lg mb-4"
+            onClick={() => setLocation(`/coloring/${imageId}`)}
+            data-testid="button-color"
+          >
+            <Palette className="mr-2 h-5 w-5" /> {t('view.colorNow')}
+          </Button>
+          
           <div className="grid grid-cols-2 gap-4">
              <Button 
                 size="lg" 
-                className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 text-lg font-bold shadow-lg"
+                variant="outline"
+                className="w-full h-14 rounded-2xl border-2 text-lg font-bold"
                 onClick={handlePrint}
+                data-testid="button-print"
               >
                 <Printer className="mr-2 h-5 w-5" /> {t('view.printNow')}
               </Button>
@@ -95,6 +107,7 @@ export default function ImageView() {
                 size="lg" 
                 variant="outline" 
                 className="w-full h-14 rounded-2xl border-2 text-lg font-bold"
+                data-testid="button-download"
               >
                 <Download className="mr-2 h-5 w-5" /> {t('view.downloadPdf')}
               </Button>

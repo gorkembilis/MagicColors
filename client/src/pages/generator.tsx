@@ -186,6 +186,32 @@ export default function Generator() {
                   variant="ghost" 
                   className="w-full h-12 font-bold text-muted-foreground"
                   data-testid="button-share"
+                  onClick={async () => {
+                    try {
+                      const response = await fetch(resultImage!);
+                      const blob = await response.blob();
+                      const file = new File([blob], `magiccolors-${Date.now()}.png`, { type: "image/png" });
+                      
+                      if (navigator.share && navigator.canShare({ files: [file] })) {
+                        await navigator.share({
+                          files: [file],
+                          title: t("share.title"),
+                          text: t("share.text")
+                        });
+                      } else {
+                        const link = document.createElement('a');
+                        link.href = resultImage!;
+                        link.download = `magiccolors-${Date.now()}.png`;
+                        link.click();
+                        toast({
+                          title: t("share.downloaded"),
+                          description: t("share.downloadedDesc"),
+                        });
+                      }
+                    } catch (error) {
+                      console.error("Share failed:", error);
+                    }
+                  }}
                 >
                   <Share2 className="h-4 w-4 mr-2" /> {t('generator.share')}
                 </Button>

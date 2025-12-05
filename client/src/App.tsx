@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation, Redirect } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -13,18 +13,34 @@ import Gallery from "@/pages/gallery";
 import Premium from "@/pages/premium";
 import Auth from "@/pages/auth";
 import Admin from "@/pages/admin";
+import Onboarding from "@/pages/onboarding";
+import Coloring from "@/pages/coloring";
+import Settings from "@/pages/settings";
+
+function OnboardingGuard() {
+  const hasCompletedOnboarding = localStorage.getItem("magiccolors_onboarding_complete") === "true";
+  
+  if (!hasCompletedOnboarding) {
+    return <Redirect to="/onboarding" />;
+  }
+  
+  return <Home />;
+}
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Home}/>
+      <Route path="/" component={OnboardingGuard}/>
+      <Route path="/onboarding" component={Onboarding}/>
       <Route path="/generate" component={Generator}/>
       <Route path="/auth" component={Auth}/>
       <Route path="/admin" component={Admin}/>
       <Route path="/pack/:id" component={PackDetail}/>
       <Route path="/view/:id" component={ImageView}/>
+      <Route path="/coloring/:id" component={Coloring}/>
       <Route path="/gallery" component={Gallery}/>
       <Route path="/premium" component={Premium}/>
+      <Route path="/settings" component={Settings}/>
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
