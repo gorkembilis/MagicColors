@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">MagicColors</string>
+    <string name="title_activity_main">MagicColors</string>
+    <string name="package_name">com.magiccolors.app</string>
+    <string name="custom_url_scheme">com.magiccolors.app</string>
+</resources>
