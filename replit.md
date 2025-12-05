@@ -12,8 +12,21 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **New Features** (December 2024):
+  - **Onboarding Flow**: 4-slide intro tutorial for first-time users (`/onboarding`)
+  - **Digital Coloring**: Interactive canvas for coloring pages with touch/mouse support (`/coloring/:id`)
+  - **New Packs**: Added Sea Creatures, Birds, Sports, and Music coloring packs
+  - **Social Sharing**: Native share API integration for sharing colored images
+  - **Settings Page**: Notification preferences and language settings (`/settings`)
 - **Admin Dashboard** (December 2024): Added comprehensive admin panel at `/admin` for managing users, viewing statistics, and managing generated images
 - **In-App Authentication** (December 2024): Replaced Replit Auth with custom email/password authentication system to avoid external redirects
+
+## Pending Integrations
+
+- **Stripe Payments**: Payment system UI is ready but Stripe integration not yet connected. When ready:
+  1. Set up Stripe integration via Replit's integration system
+  2. Add payment endpoints to `server/routes.ts`
+  3. Connect purchase flow in `client/src/pages/premium.tsx`
 
 ## System Architecture
 
@@ -45,11 +58,14 @@ Preferred communication style: Simple, everyday language.
 
 **Routing Structure**
 - `/` - Home page with hero, prompt input, and pack previews
+- `/onboarding` - First-time user tutorial (4 slides)
 - `/auth` - Login and registration page
 - `/generate` - AI generation page with loading states and result display
 - `/pack/:id` - Pack detail page showing all images in a collection
-- `/view/:id` - Individual image view with print/download options
+- `/view/:id` - Individual image view with print/download/color options
+- `/coloring/:id` - Digital coloring canvas with touch support
 - `/gallery` - User's saved AI-generated images
+- `/settings` - Notification preferences and language settings
 - `/premium` - Premium tier upsell page
 - `/admin` - Admin dashboard (requires admin role)
 
@@ -147,10 +163,10 @@ Preferred communication style: Simple, everyday language.
 
 **Static Packs**
 - Pre-generated coloring packs stored in `client/src/lib/mock-data.ts`
-- Pack categories: Animals, Cars, Fruits, Dinosaurs, Princess, Space
-- Each pack contains 10 images with titles and IDs
+- Pack categories: Animals, Cars, Fruits, Dinosaurs, Princess, Space, Pokemon-style, Superheroes, Sea Creatures, Birds, Sports, Music
+- Each pack contains 10-20 images with titles and IDs
 - Images stored in `attached_assets/generated_images/` directory
-- Premium packs require subscription to unlock
+- Premium packs (Princess, Space, Pokemon, Superheroes, Sports, Music) require subscription to unlock
 
 ## External Dependencies
 

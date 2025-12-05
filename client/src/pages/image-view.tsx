@@ -60,7 +60,34 @@ export default function ImageView() {
               <ArrowLeft className="h-6 w-6" />
             </Button>
           </Link>
-          <Button variant="ghost" size="icon" className="text-white hover:bg-white/20 rounded-full">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="text-white hover:bg-white/20 rounded-full"
+            data-testid="button-share-header"
+            onClick={async () => {
+              try {
+                const response = await fetch(imageUrl);
+                const blob = await response.blob();
+                const file = new File([blob], `magiccolors-${imageId}.png`, { type: "image/png" });
+                
+                if (navigator.share && navigator.canShare({ files: [file] })) {
+                  await navigator.share({
+                    files: [file],
+                    title: title,
+                    text: t("share.text")
+                  });
+                } else {
+                  const link = document.createElement('a');
+                  link.href = imageUrl;
+                  link.download = `magiccolors-${imageId}.png`;
+                  link.click();
+                }
+              } catch (error) {
+                console.error("Share failed:", error);
+              }
+            }}
+          >
              <Share2 className="h-6 w-6" />
           </Button>
         </div>
