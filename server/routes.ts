@@ -38,6 +38,7 @@ export async function registerRoutes(
         isPremium: user.isPremium,
         isAdmin: user.isAdmin,
         profileImageUrl: user.profileImageUrl,
+        createdAt: user.createdAt,
       });
     } catch (error) {
       console.error("Error fetching user:", error);
@@ -77,6 +78,72 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error fetching user images:", error);
       res.status(500).json({ message: "Failed to fetch images" });
+    }
+  });
+
+  app.get("/api/favorites", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      const favorites = await storage.getUserFavorites(userId);
+      res.json(favorites);
+    } catch (error) {
+      console.error("Error fetching favorites:", error);
+      res.status(500).json({ message: "Favoriler alınamadı" });
+    }
+  });
+
+  app.post("/api/favorites", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      const { imageId, packId, imageUrl, title } = req.body;
+
+      if (!imageId || !imageUrl) {
+        return res.status(400).json({ message: "imageId ve imageUrl gerekli" });
+      }
+
+      const existing = await storage.isFavorite(userId, imageId);
+      if (existing) {
+        return res.status(400).json({ message: "Bu resim zaten favorilerde" });
+      }
+
+      const favorite = await storage.addFavorite({
+        userId,
+        imageId,
+        packId,
+        imageUrl,
+        title,
+      });
+
+      res.json(favorite);
+    } catch (error) {
+      console.error("Error adding favorite:", error);
+      res.status(500).json({ message: "Favori eklenemedi" });
+    }
+  });
+
+  app.delete("/api/favorites/:imageId", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      const { imageId } = req.params;
+
+      await storage.removeFavorite(userId, imageId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error removing favorite:", error);
+      res.status(500).json({ message: "Favori kaldırılamadı" });
+    }
+  });
+
+  app.get("/api/favorites/:imageId", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      const { imageId } = req.params;
+
+      const isFavorite = await storage.isFavorite(userId, imageId);
+      res.json({ isFavorite });
+    } catch (error) {
+      console.error("Error checking favorite:", error);
+      res.status(500).json({ message: "Favori durumu alınamadı" });
     }
   });
 

@@ -1,13 +1,16 @@
 import {
   users,
   generatedImages,
+  favorites,
   type User,
   type UpsertUser,
   type GeneratedImage,
   type InsertGeneratedImage,
+  type Favorite,
+  type InsertFavorite,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, count, sql } from "drizzle-orm";
+import { eq, desc, count, sql, and } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -16,6 +19,11 @@ export interface IStorage {
   createUserWithPassword(email: string, passwordHash: string, firstName?: string, lastName?: string): Promise<User>;
   getUserGeneratedImages(userId: string): Promise<GeneratedImage[]>;
   createGeneratedImage(image: InsertGeneratedImage): Promise<GeneratedImage>;
+  
+  getUserFavorites(userId: string): Promise<Favorite[]>;
+  addFavorite(favorite: InsertFavorite): Promise<Favorite>;
+  removeFavorite(userId: string, imageId: string): Promise<boolean>;
+  isFavorite(userId: string, imageId: string): Promise<boolean>;
   
   getAllUsers(): Promise<User[]>;
   updateUser(id: string, data: Partial<User>): Promise<User | undefined>;
@@ -85,6 +93,37 @@ export class DatabaseStorage implements IStorage {
       .values(imageData)
       .returning();
     return image;
+  }
+
+  async getUserFavorites(userId: string): Promise<Favorite[]> {
+    return await db
+      .select()
+      .from(favorites)
+      .where(eq(favorites.userId, userId))
+      .orderBy(desc(favorites.createdAt));
+  }
+
+  async addFavorite(favoriteData: InsertFavorite): Promise<Favorite> {
+    const [favorite] = await db
+      .insert(favorites)
+      .values(favoriteData)
+      .returning();
+    return favorite;
+  }
+
+  async removeFavorite(userId: string, imageId: string): Promise<boolean> {
+    await db
+      .delete(favorites)
+      .where(and(eq(favorites.userId, userId), eq(favorites.imageId, imageId)));
+    return true;
+  }
+
+  async isFavorite(userId: string, imageId: string): Promise<boolean> {
+    const [favorite] = await db
+      .select()
+      .from(favorites)
+      .where(and(eq(favorites.userId, userId), eq(favorites.imageId, imageId)));
+    return !!favorite;
   }
 
   async getAllUsers(): Promise<User[]> {

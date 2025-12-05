@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, Wand2, Crown, Image as ImageIcon } from "lucide-react";
+import { Home, Wand2, Crown, Image as ImageIcon, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n";
 
@@ -61,6 +61,18 @@ export function BottomNav() {
         >
           <Crown className={cn("h-6 w-6", isActive("/premium") && "fill-current")} />
           <span className="text-[10px] font-bold">{t('nav.premium')}</span>
+        </Link>
+
+        <Link
+          href="/profile"
+          className={cn(
+            "flex flex-col items-center justify-center gap-1 p-2 transition-colors",
+            isActive("/profile") ? "text-primary" : "text-muted-foreground hover:text-primary/70"
+          )}
+          data-testid="nav-profile"
+        >
+          <User className={cn("h-6 w-6", isActive("/profile") && "fill-current")} />
+          <span className="text-[10px] font-bold">{t('nav.profile')}</span>
         </Link>
       </div>
       {/* iPhone Home Indicator Spacer */}

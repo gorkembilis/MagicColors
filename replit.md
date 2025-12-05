@@ -12,6 +12,12 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **Profile & Favorites System** (December 2024):
+  - **Profile Page**: User profile at `/profile` with stats, achievements, and favorites gallery
+  - **Favorites System**: Heart button to save favorite coloring pages to user profile
+  - **Profile Navigation**: Added profile button to bottom navigation menu
+  - **Achievements**: Gamification with 3 unlockable achievements (First Artwork, Color Master, Collector)
+  - **Logout Functionality**: Added logout function to authentication system
 - **New Features** (December 2024):
   - **Onboarding Flow**: 4-slide intro tutorial for first-time users (`/onboarding`)
   - **Digital Coloring**: Interactive canvas for coloring pages with touch/mouse support (`/coloring/:id`)

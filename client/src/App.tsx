@@ -16,6 +16,7 @@ import Admin from "@/pages/admin";
 import Onboarding from "@/pages/onboarding";
 import Coloring from "@/pages/coloring";
 import Settings from "@/pages/settings";
+import Profile from "@/pages/profile";
 
 function OnboardingGuard() {
   const hasCompletedOnboarding = localStorage.getItem("magiccolors_onboarding_complete") === "true";
@@ -41,6 +42,7 @@ function Router() {
       <Route path="/gallery" component={Gallery}/>
       <Route path="/premium" component={Premium}/>
       <Route path="/settings" component={Settings}/>
+      <Route path="/profile" component={Profile}/>
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>

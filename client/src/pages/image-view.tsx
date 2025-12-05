@@ -2,11 +2,13 @@ import { useRoute, Link, useLocation } from "wouter";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Button } from "@/components/ui/button";
 import { packs } from "@/lib/mock-data";
-import { ArrowLeft, Printer, Download, Share2, X, Palette } from "lucide-react";
+import { ArrowLeft, Printer, Download, Share2, X, Palette, Heart } from "lucide-react";
 import { motion } from "framer-motion";
 import NotFound from "@/pages/not-found";
 import { useState } from "react";
 import { useI18n } from "@/lib/i18n";
+import { useAuth } from "@/hooks/useAuth";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 function AdBanner() {
   const [visible, setVisible] = useState(true);
@@ -34,6 +36,8 @@ export default function ImageView() {
   const [, setLocation] = useLocation();
   const imageId = params?.id;
   const { t } = useI18n();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
   
   const packId = imageId?.split("-")[0];
   const pack = packs.find(p => p.id === packId);
@@ -45,6 +49,72 @@ export default function ImageView() {
 
   const imageUrl = image.url; 
   const title = `${t(`pack.${pack.id}`)} - Page ${imageId.split("-")[1]}`;
+
+  const { data: favoriteData } = useQuery<{ isFavorite: boolean }>({
+    queryKey: [`/api/favorites/${imageId}`],
+    queryFn: async () => {
+      const res = await fetch(`/api/favorites/${imageId}`, {
+        credentials: "include",
+      });
+      if (!res.ok) {
+        if (res.status === 401) return { isFavorite: false };
+        throw new Error("Failed to check favorite status");
+      }
+      return res.json();
+    },
+    enabled: !!user && !!imageId,
+  });
+
+  const isFavorite = favoriteData?.isFavorite || false;
+
+  const addFavoriteMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch("/api/favorites", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          imageId,
+          packId,
+          imageUrl,
+          title,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to add favorite");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/favorites/${imageId}`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/favorites"] });
+    },
+  });
+
+  const removeFavoriteMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch(`/api/favorites/${imageId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Failed to remove favorite");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/favorites/${imageId}`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/favorites"] });
+    },
+  });
+
+  const toggleFavorite = () => {
+    if (!user) {
+      setLocation("/auth");
+      return;
+    }
+    if (isFavorite) {
+      removeFavoriteMutation.mutate();
+    } else {
+      addFavoriteMutation.mutate();
+    }
+  };
 
   const handlePrint = () => {
     window.print();
@@ -60,36 +130,47 @@ export default function ImageView() {
               <ArrowLeft className="h-6 w-6" />
             </Button>
           </Link>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="text-white hover:bg-white/20 rounded-full"
-            data-testid="button-share-header"
-            onClick={async () => {
-              try {
-                const response = await fetch(imageUrl);
-                const blob = await response.blob();
-                const file = new File([blob], `magiccolors-${imageId}.png`, { type: "image/png" });
-                
-                if (navigator.share && navigator.canShare({ files: [file] })) {
-                  await navigator.share({
-                    files: [file],
-                    title: title,
-                    text: t("share.text")
-                  });
-                } else {
-                  const link = document.createElement('a');
-                  link.href = imageUrl;
-                  link.download = `magiccolors-${imageId}.png`;
-                  link.click();
+          <div className="flex gap-2">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="text-white hover:bg-white/20 rounded-full"
+              data-testid="button-favorite"
+              onClick={toggleFavorite}
+            >
+              <Heart className={`h-6 w-6 transition-all ${isFavorite ? "fill-red-500 text-red-500" : ""}`} />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="text-white hover:bg-white/20 rounded-full"
+              data-testid="button-share-header"
+              onClick={async () => {
+                try {
+                  const response = await fetch(imageUrl);
+                  const blob = await response.blob();
+                  const file = new File([blob], `magiccolors-${imageId}.png`, { type: "image/png" });
+                  
+                  if (navigator.share && navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                      files: [file],
+                      title: title,
+                      text: t("share.text")
+                    });
+                  } else {
+                    const link = document.createElement('a');
+                    link.href = imageUrl;
+                    link.download = `magiccolors-${imageId}.png`;
+                    link.click();
+                  }
+                } catch (error) {
+                  console.error("Share failed:", error);
                 }
-              } catch (error) {
-                console.error("Share failed:", error);
-              }
-            }}
-          >
-             <Share2 className="h-6 w-6" />
-          </Button>
+              }}
+            >
+               <Share2 className="h-6 w-6" />
+            </Button>
+          </div>
         </div>
 
         {/* Image Area - Zoomable/Pannable feel */}

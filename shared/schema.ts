@@ -35,6 +35,16 @@ export const generatedImages = pgTable("generated_images", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const favorites = pgTable("favorites", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  imageId: varchar("image_id").notNull(),
+  packId: varchar("pack_id"),
+  imageUrl: text("image_url").notNull(),
+  title: varchar("title"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
@@ -43,6 +53,11 @@ export const insertUserSchema = createInsertSchema(users).omit({
 });
 
 export const insertGeneratedImageSchema = createInsertSchema(generatedImages).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertFavoriteSchema = createInsertSchema(favorites).omit({
   id: true,
   createdAt: true,
 });
@@ -64,3 +79,5 @@ export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type GeneratedImage = typeof generatedImages.$inferSelect;
 export type InsertGeneratedImage = z.infer<typeof insertGeneratedImageSchema>;
+export type Favorite = typeof favorites.$inferSelect;
+export type InsertFavorite = z.infer<typeof insertFavoriteSchema>;
