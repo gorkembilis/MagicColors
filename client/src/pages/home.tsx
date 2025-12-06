@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { packs, Difficulty } from "@/lib/mock-data";
-import { Wand2, Lock, ArrowRight, Globe, Trophy, Sparkles, Palette, Download, Share2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Wand2, Lock, ArrowRight, Globe, Trophy, Sparkles, Palette, Download, Share2, ChevronLeft, ChevronRight, Search, X } from "lucide-react";
 import { Link, useLocation } from "wouter";
 
 import sliderImg1 from "@assets/generated_images/child_coloring_with_magic.png";
@@ -22,6 +22,8 @@ export default function Home() {
   const [prompt, setPrompt] = useState("");
   const [difficultyFilter, setDifficultyFilter] = useState<DifficultyFilter>('all');
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const { t, language, setLanguage } = useI18n();
 
   const slides = [
@@ -65,9 +67,12 @@ export default function Home() {
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
   const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
 
-  const filteredPacks = difficultyFilter === 'all' 
-    ? packs 
-    : packs.filter(p => p.difficulty === difficultyFilter);
+  const filteredPacks = packs.filter(p => {
+    const matchesDifficulty = difficultyFilter === 'all' || p.difficulty === difficultyFilter;
+    const packName = t(`pack.${p.id}`).toLowerCase();
+    const matchesSearch = searchQuery === "" || packName.includes(searchQuery.toLowerCase());
+    return matchesDifficulty && matchesSearch;
+  });
 
   const difficultyColors: Record<Difficulty, string> = {
     easy: "bg-green-100 text-green-700 border-green-200",
@@ -255,22 +260,63 @@ export default function Home() {
           </Button>
         </div>
 
-        {/* Difficulty Filter */}
-        <div className="mb-4 flex gap-2 overflow-x-auto pb-2">
-          {(['all', 'easy', 'medium', 'hard'] as const).map((diff) => (
-            <Button
-              key={diff}
-              variant={difficultyFilter === diff ? "default" : "outline"}
-              size="sm"
-              onClick={() => setDifficultyFilter(diff)}
-              className={`h-8 px-3 text-xs font-medium rounded-full whitespace-nowrap ${
-                difficultyFilter === diff ? "" : "bg-white"
-              }`}
-              data-testid={`filter-difficulty-${diff}`}
-            >
-              {t(`difficulty.${diff}`)}
-            </Button>
-          ))}
+        {/* Difficulty Filter with Search */}
+        <div className="mb-4">
+          {searchOpen ? (
+            <div className="flex gap-2 items-center">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder={t('search.placeholder')}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9 h-10 rounded-full bg-white"
+                  autoFocus
+                  data-testid="input-search-packs"
+                />
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  setSearchOpen(false);
+                  setSearchQuery("");
+                }}
+                className="h-10 w-10 rounded-full"
+                data-testid="button-close-search"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+          ) : (
+            <div className="flex gap-2 overflow-x-auto pb-2">
+              {(['all', 'easy', 'medium', 'hard'] as const).map((diff) => (
+                <Button
+                  key={diff}
+                  variant={difficultyFilter === diff ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setDifficultyFilter(diff)}
+                  className={`h-8 px-3 text-xs font-medium rounded-full whitespace-nowrap ${
+                    difficultyFilter === diff ? "" : "bg-white"
+                  }`}
+                  data-testid={`filter-difficulty-${diff}`}
+                >
+                  {t(`difficulty.${diff}`)}
+                </Button>
+              ))}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSearchOpen(true)}
+                className="h-8 px-3 text-xs font-medium rounded-full whitespace-nowrap bg-white ml-auto"
+                data-testid="button-open-search"
+              >
+                <Search className="h-4 w-4 mr-1" />
+                {t('search.button')}
+              </Button>
+            </div>
+          )}
         </div>
 
         <motion.div 

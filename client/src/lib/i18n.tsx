@@ -42,6 +42,9 @@ const translations: Record<Language, Record<string, string>> = {
     "slider.slide4.title": "Share Your Art",
     "slider.slide4.desc": "Share your masterpieces with friends and family. Join weekly contests to win prizes!",
 
+    "search.button": "Search",
+    "search.placeholder": "Search packs...",
+
     "home.packs.title": "Explore Packs",
     "home.packs.subtitle": "Ready-to-print collections",
     "home.packs.viewAll": "View All",
@@ -243,6 +246,9 @@ const translations: Record<Language, Record<string, string>> = {
     "slider.slide3.desc": "Eserlerini PDF olarak indir veya doğrudan yazdır. Çevrimdışı boyama keyfi için harika!",
     "slider.slide4.title": "Paylaş",
     "slider.slide4.desc": "Başyapıtlarını arkadaşların ve ailenle paylaş. Haftalık yarışmalara katıl ve ödül kazan!",
+
+    "search.button": "Ara",
+    "search.placeholder": "Paket ara...",
 
     "home.packs.title": "Paketleri Keşfet",
     "home.packs.subtitle": "Yazdırmaya hazır koleksiyonlar",
