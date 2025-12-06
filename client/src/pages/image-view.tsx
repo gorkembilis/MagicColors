@@ -125,17 +125,50 @@ export default function ImageView() {
         <head>
           <title>${title}</title>
           <style>
-            * { margin: 0; padding: 0; }
-            body { display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-            img { max-width: 100%; max-height: 100vh; object-fit: contain; }
+            @page {
+              size: A4 portrait;
+              margin: 1cm;
+            }
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            html, body {
+              width: 210mm;
+              height: 297mm;
+              background: white;
+            }
+            body {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              padding: 1cm;
+            }
+            .page-container {
+              width: 100%;
+              height: 100%;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+            }
+            img {
+              max-width: 100%;
+              max-height: 100%;
+              object-fit: contain;
+            }
             @media print {
-              body { margin: 0; padding: 0; }
-              img { width: 100%; height: auto; max-height: 100vh; }
+              html, body {
+                width: 210mm;
+                height: 297mm;
+              }
+              .page-container {
+                width: 190mm;
+                height: 277mm;
+              }
             }
           </style>
         </head>
         <body>
-          <img src="${imageUrl}" alt="${title}" onload="window.print(); window.close();" />
+          <div class="page-container">
+            <img src="${imageUrl}" alt="${title}" onload="window.print(); window.close();" />
+          </div>
         </body>
         </html>
       `);
@@ -174,18 +207,50 @@ export default function ImageView() {
           <head>
             <title>${title}</title>
             <style>
-              * { margin: 0; padding: 0; }
-              body { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: white; }
-              img { max-width: 100%; max-height: 100vh; object-fit: contain; }
+              @page {
+                size: A4 portrait;
+                margin: 1cm;
+              }
+              * { margin: 0; padding: 0; box-sizing: border-box; }
+              html, body {
+                width: 210mm;
+                height: 297mm;
+                background: white;
+              }
+              body {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 1cm;
+              }
+              .page-container {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+              }
+              img {
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+              }
               @media print {
-                @page { margin: 0.5cm; }
-                body { margin: 0; padding: 0; }
-                img { width: 100%; height: auto; }
+                html, body {
+                  width: 210mm;
+                  height: 297mm;
+                }
+                .page-container {
+                  width: 190mm;
+                  height: 277mm;
+                }
               }
             </style>
           </head>
           <body>
-            <img src="${dataUrl}" alt="${title}" />
+            <div class="page-container">
+              <img src="${dataUrl}" alt="${title}" />
+            </div>
             <script>
               setTimeout(() => { window.print(); }, 100);
             </script>
