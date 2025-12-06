@@ -5,6 +5,8 @@ import {
   contests,
   contestSubmissions,
   contestVotes,
+  promoCodes,
+  promoCodeRedemptions,
   type User,
   type UpsertUser,
   type GeneratedImage,
@@ -16,6 +18,9 @@ import {
   type ContestSubmission,
   type InsertContestSubmission,
   type ContestVote,
+  type PromoCode,
+  type InsertPromoCode,
+  type PromoCodeRedemption,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, count, sql, and } from "drizzle-orm";
@@ -48,6 +53,15 @@ export interface IStorage {
   voteForSubmission(submissionId: number, voterId: string): Promise<boolean>;
   hasUserVoted(submissionId: number, voterId: string): Promise<boolean>;
   getLeaderboard(contestId: number): Promise<(ContestSubmission & { userName?: string | null })[]>;
+  
+  getAllPromoCodes(): Promise<PromoCode[]>;
+  getPromoCodeByCode(code: string): Promise<PromoCode | undefined>;
+  createPromoCode(data: InsertPromoCode): Promise<PromoCode>;
+  updatePromoCode(id: number, data: Partial<PromoCode>): Promise<PromoCode | undefined>;
+  deletePromoCode(id: number): Promise<boolean>;
+  redeemPromoCode(userId: string, code: string): Promise<{ success: boolean; message: string; user?: User }>;
+  getPromoCodeRedemptions(promoCodeId: number): Promise<(PromoCodeRedemption & { userEmail?: string | null })[]>;
+  hasUserRedeemedCode(userId: string, promoCodeId: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -266,6 +280,120 @@ export class DatabaseStorage implements IStorage {
 
   async getLeaderboard(contestId: number): Promise<(ContestSubmission & { userName?: string | null })[]> {
     return this.getContestSubmissions(contestId);
+  }
+
+  async getAllPromoCodes(): Promise<PromoCode[]> {
+    return await db.select().from(promoCodes).orderBy(desc(promoCodes.createdAt));
+  }
+
+  async getPromoCodeByCode(code: string): Promise<PromoCode | undefined> {
+    const [promoCode] = await db
+      .select()
+      .from(promoCodes)
+      .where(eq(promoCodes.code, code.toUpperCase()));
+    return promoCode;
+  }
+
+  async createPromoCode(data: InsertPromoCode): Promise<PromoCode> {
+    const [promoCode] = await db
+      .insert(promoCodes)
+      .values({
+        ...data,
+        code: data.code.toUpperCase(),
+        remainingUses: data.maxUses,
+      })
+      .returning();
+    return promoCode;
+  }
+
+  async updatePromoCode(id: number, data: Partial<PromoCode>): Promise<PromoCode | undefined> {
+    const [promoCode] = await db
+      .update(promoCodes)
+      .set(data)
+      .where(eq(promoCodes.id, id))
+      .returning();
+    return promoCode;
+  }
+
+  async deletePromoCode(id: number): Promise<boolean> {
+    await db.delete(promoCodes).where(eq(promoCodes.id, id));
+    return true;
+  }
+
+  async redeemPromoCode(userId: string, code: string): Promise<{ success: boolean; message: string; user?: User }> {
+    const promoCode = await this.getPromoCodeByCode(code);
+    
+    if (!promoCode) {
+      return { success: false, message: "Invalid promo code" };
+    }
+    
+    if (!promoCode.isActive) {
+      return { success: false, message: "This promo code is no longer active" };
+    }
+    
+    if (promoCode.remainingUses <= 0) {
+      return { success: false, message: "This promo code has been fully used" };
+    }
+    
+    if (promoCode.expiresAt && new Date(promoCode.expiresAt) < new Date()) {
+      return { success: false, message: "This promo code has expired" };
+    }
+    
+    const alreadyRedeemed = await this.hasUserRedeemedCode(userId, promoCode.id);
+    if (alreadyRedeemed) {
+      return { success: false, message: "You have already used this promo code" };
+    }
+    
+    await db.insert(promoCodeRedemptions).values({
+      promoCodeId: promoCode.id,
+      userId,
+    });
+    
+    await db
+      .update(promoCodes)
+      .set({ remainingUses: sql`${promoCodes.remainingUses} - 1` })
+      .where(eq(promoCodes.id, promoCode.id));
+    
+    const premiumUntil = new Date();
+    premiumUntil.setDate(premiumUntil.getDate() + promoCode.premiumDays);
+    
+    const updatedUser = await this.updateUser(userId, {
+      isPremium: true,
+      premiumUntil,
+    });
+    
+    return { 
+      success: true, 
+      message: `Premium activated for ${promoCode.premiumDays} days!`,
+      user: updatedUser 
+    };
+  }
+
+  async getPromoCodeRedemptions(promoCodeId: number): Promise<(PromoCodeRedemption & { userEmail?: string | null })[]> {
+    const redemptions = await db
+      .select({
+        id: promoCodeRedemptions.id,
+        promoCodeId: promoCodeRedemptions.promoCodeId,
+        userId: promoCodeRedemptions.userId,
+        redeemedAt: promoCodeRedemptions.redeemedAt,
+        userEmail: users.email,
+      })
+      .from(promoCodeRedemptions)
+      .leftJoin(users, eq(promoCodeRedemptions.userId, users.id))
+      .where(eq(promoCodeRedemptions.promoCodeId, promoCodeId))
+      .orderBy(desc(promoCodeRedemptions.redeemedAt));
+    return redemptions;
+  }
+
+  async hasUserRedeemedCode(userId: string, promoCodeId: number): Promise<boolean> {
+    const [redemption] = await db
+      .select()
+      .from(promoCodeRedemptions)
+      .where(and(
+        eq(promoCodeRedemptions.userId, userId),
+        eq(promoCodeRedemptions.promoCodeId, promoCodeId)
+      ));
+    return !!redemption;
   }
 }
 
