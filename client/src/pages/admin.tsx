@@ -28,7 +28,21 @@ import {
   Settings,
   BarChart3,
   RefreshCw,
+  Ticket,
+  Plus,
+  Copy,
+  Check,
+  X,
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { motion } from "framer-motion";
 import { useI18n } from "@/lib/i18n";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -61,6 +75,18 @@ interface Stats {
   premiumUsers: number;
 }
 
+interface PromoCode {
+  id: number;
+  code: string;
+  description: string | null;
+  maxUses: number;
+  remainingUses: number;
+  premiumDays: number;
+  expiresAt: string | null;
+  isActive: boolean;
+  createdAt: string;
+}
+
 export default function Admin() {
   const [, setLocation] = useLocation();
   const { language } = useI18n();
@@ -68,6 +94,15 @@ export default function Admin() {
   const queryClient = useQueryClient();
   const { user, isLoading: authLoading } = useAuth();
   const [selectedTab, setSelectedTab] = useState("stats");
+  const [promoDialogOpen, setPromoDialogOpen] = useState(false);
+  const [newPromoCode, setNewPromoCode] = useState({
+    code: "",
+    description: "",
+    maxUses: 1,
+    premiumDays: 30,
+    expiresAt: "",
+  });
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
   const { data: stats, isLoading: statsLoading, refetch: refetchStats } = useQuery<Stats>({
     queryKey: ["/api/admin/stats"],
@@ -82,6 +117,79 @@ export default function Admin() {
   const { data: images, isLoading: imagesLoading, refetch: refetchImages } = useQuery<AdminImage[]>({
     queryKey: ["/api/admin/images"],
     enabled: !!user?.isAdmin,
+  });
+
+  const { data: promoCodes, isLoading: promoCodesLoading, refetch: refetchPromoCodes } = useQuery<PromoCode[]>({
+    queryKey: ["/api/admin/promo-codes"],
+    enabled: !!user?.isAdmin,
+  });
+
+  const createPromoCodeMutation = useMutation({
+    mutationFn: async (data: typeof newPromoCode) => {
+      const res = await apiRequest("POST", "/api/admin/promo-codes", {
+        ...data,
+        expiresAt: data.expiresAt || null,
+      });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/promo-codes"] });
+      setPromoDialogOpen(false);
+      setNewPromoCode({ code: "", description: "", maxUses: 1, premiumDays: 30, expiresAt: "" });
+      toast({
+        title: language === "tr" ? "Başarılı" : "Success",
+        description: language === "tr" ? "Promosyon kodu oluşturuldu" : "Promo code created",
+      });
+    },
+    onError: () => {
+      toast({
+        title: language === "tr" ? "Hata" : "Error",
+        description: language === "tr" ? "Promosyon kodu oluşturulamadı" : "Failed to create promo code",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updatePromoCodeMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: Partial<PromoCode> }) => {
+      const res = await apiRequest("PATCH", `/api/admin/promo-codes/${id}`, data);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/promo-codes"] });
+      toast({
+        title: language === "tr" ? "Başarılı" : "Success",
+        description: language === "tr" ? "Promosyon kodu güncellendi" : "Promo code updated",
+      });
+    },
+    onError: () => {
+      toast({
+        title: language === "tr" ? "Hata" : "Error",
+        description: language === "tr" ? "Promosyon kodu güncellenemedi" : "Failed to update promo code",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deletePromoCodeMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const res = await apiRequest("DELETE", `/api/admin/promo-codes/${id}`);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/promo-codes"] });
+      toast({
+        title: language === "tr" ? "Başarılı" : "Success",
+        description: language === "tr" ? "Promosyon kodu silindi" : "Promo code deleted",
+      });
+    },
+    onError: () => {
+      toast({
+        title: language === "tr" ? "Hata" : "Error",
+        description: language === "tr" ? "Promosyon kodu silinemedi" : "Failed to delete promo code",
+        variant: "destructive",
+      });
+    },
   });
 
   const updateUserMutation = useMutation({
@@ -185,6 +293,22 @@ export default function Admin() {
     refetchStats();
     refetchUsers();
     refetchImages();
+    refetchPromoCodes();
+  };
+
+  const copyToClipboard = (code: string) => {
+    navigator.clipboard.writeText(code);
+    setCopiedCode(code);
+    setTimeout(() => setCopiedCode(null), 2000);
+  };
+
+  const generateRandomCode = () => {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let code = "";
+    for (let i = 0; i < 8; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    setNewPromoCode(prev => ({ ...prev, code }));
   };
 
   return (
@@ -220,18 +344,22 @@ export default function Admin() {
         </div>
 
         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="flex-1 flex flex-col">
-          <TabsList className="grid w-full grid-cols-3 mx-4 mt-4" style={{ width: "calc(100% - 32px)" }}>
-            <TabsTrigger value="stats" className="flex items-center gap-1" data-testid="tab-stats">
-              <BarChart3 className="h-4 w-4" />
+          <TabsList className="grid w-full grid-cols-4 mx-4 mt-4" style={{ width: "calc(100% - 32px)" }}>
+            <TabsTrigger value="stats" className="flex items-center gap-1 text-xs px-2" data-testid="tab-stats">
+              <BarChart3 className="h-3 w-3" />
               {language === "tr" ? "İstatistik" : "Stats"}
             </TabsTrigger>
-            <TabsTrigger value="users" className="flex items-center gap-1" data-testid="tab-users">
-              <Users className="h-4 w-4" />
+            <TabsTrigger value="users" className="flex items-center gap-1 text-xs px-2" data-testid="tab-users">
+              <Users className="h-3 w-3" />
               {language === "tr" ? "Üyeler" : "Users"}
             </TabsTrigger>
-            <TabsTrigger value="images" className="flex items-center gap-1" data-testid="tab-images">
-              <Image className="h-4 w-4" />
+            <TabsTrigger value="images" className="flex items-center gap-1 text-xs px-2" data-testid="tab-images">
+              <Image className="h-3 w-3" />
               {language === "tr" ? "Görseller" : "Images"}
+            </TabsTrigger>
+            <TabsTrigger value="promo" className="flex items-center gap-1 text-xs px-2" data-testid="tab-promo">
+              <Ticket className="h-3 w-3" />
+              {language === "tr" ? "Kodlar" : "Codes"}
             </TabsTrigger>
           </TabsList>
 
@@ -477,6 +605,203 @@ export default function Admin() {
                 )}
               </div>
             </ScrollArea>
+          </TabsContent>
+
+          <TabsContent value="promo" className="flex-1">
+            <div className="p-4">
+              <Dialog open={promoDialogOpen} onOpenChange={setPromoDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="w-full mb-4" data-testid="button-create-promo">
+                    <Plus className="h-4 w-4 mr-2" />
+                    {language === "tr" ? "Yeni Kod Oluştur" : "Create New Code"}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>
+                      {language === "tr" ? "Yeni Promosyon Kodu" : "New Promo Code"}
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>{language === "tr" ? "Kod" : "Code"}</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          value={newPromoCode.code}
+                          onChange={(e) => setNewPromoCode(prev => ({ ...prev, code: e.target.value.toUpperCase() }))}
+                          placeholder="PREMIUM2024"
+                          data-testid="input-promo-code-new"
+                        />
+                        <Button variant="outline" onClick={generateRandomCode} type="button">
+                          {language === "tr" ? "Rastgele" : "Random"}
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>{language === "tr" ? "Açıklama" : "Description"}</Label>
+                      <Input
+                        value={newPromoCode.description}
+                        onChange={(e) => setNewPromoCode(prev => ({ ...prev, description: e.target.value }))}
+                        placeholder={language === "tr" ? "Kampanya açıklaması" : "Campaign description"}
+                        data-testid="input-promo-description"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>{language === "tr" ? "Kullanım Sayısı" : "Max Uses"}</Label>
+                        <Input
+                          type="number"
+                          min="1"
+                          value={newPromoCode.maxUses}
+                          onChange={(e) => setNewPromoCode(prev => ({ ...prev, maxUses: parseInt(e.target.value) || 1 }))}
+                          data-testid="input-promo-max-uses"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>{language === "tr" ? "Premium Gün" : "Premium Days"}</Label>
+                        <Input
+                          type="number"
+                          min="1"
+                          value={newPromoCode.premiumDays}
+                          onChange={(e) => setNewPromoCode(prev => ({ ...prev, premiumDays: parseInt(e.target.value) || 30 }))}
+                          data-testid="input-promo-days"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>{language === "tr" ? "Son Kullanma Tarihi (Opsiyonel)" : "Expiry Date (Optional)"}</Label>
+                      <Input
+                        type="date"
+                        value={newPromoCode.expiresAt}
+                        onChange={(e) => setNewPromoCode(prev => ({ ...prev, expiresAt: e.target.value }))}
+                        data-testid="input-promo-expires"
+                      />
+                    </div>
+                    <Button
+                      className="w-full"
+                      onClick={() => createPromoCodeMutation.mutate(newPromoCode)}
+                      disabled={!newPromoCode.code || createPromoCodeMutation.isPending}
+                      data-testid="button-save-promo"
+                    >
+                      {createPromoCodeMutation.isPending 
+                        ? (language === "tr" ? "Oluşturuluyor..." : "Creating...") 
+                        : (language === "tr" ? "Oluştur" : "Create")}
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
+              <ScrollArea className="h-[calc(100vh-350px)]">
+                <div className="space-y-3">
+                  {promoCodesLoading ? (
+                    <div className="flex justify-center py-8">
+                      <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+                    </div>
+                  ) : promoCodes?.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      {language === "tr" ? "Henüz promosyon kodu yok" : "No promo codes yet"}
+                    </div>
+                  ) : (
+                    promoCodes?.map((promo) => (
+                      <Card key={promo.id} className="overflow-hidden" data-testid={`card-promo-${promo.id}`}>
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              <code className="bg-muted px-2 py-1 rounded font-mono text-sm font-bold">
+                                {promo.code}
+                              </code>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7"
+                                onClick={() => copyToClipboard(promo.code)}
+                                data-testid={`button-copy-${promo.id}`}
+                              >
+                                {copiedCode === promo.code ? (
+                                  <Check className="h-3 w-3 text-green-500" />
+                                ) : (
+                                  <Copy className="h-3 w-3" />
+                                )}
+                              </Button>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Switch
+                                checked={promo.isActive}
+                                onCheckedChange={(checked) =>
+                                  updatePromoCodeMutation.mutate({ id: promo.id, data: { isActive: checked } })
+                                }
+                                disabled={updatePromoCodeMutation.isPending}
+                                data-testid={`switch-active-${promo.id}`}
+                              />
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-7 w-7 text-destructive hover:text-destructive"
+                                    data-testid={`button-delete-promo-${promo.id}`}
+                                  >
+                                    <Trash2 className="h-3 w-3" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                      {language === "tr" ? "Kodu Sil?" : "Delete Code?"}
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      {language === "tr"
+                                        ? "Bu işlem geri alınamaz."
+                                        : "This action cannot be undone."}
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>
+                                      {language === "tr" ? "İptal" : "Cancel"}
+                                    </AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => deletePromoCodeMutation.mutate(promo.id)}
+                                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                    >
+                                      {language === "tr" ? "Sil" : "Delete"}
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
+                          </div>
+                          
+                          {promo.description && (
+                            <p className="text-sm text-muted-foreground mb-2">{promo.description}</p>
+                          )}
+                          
+                          <div className="flex flex-wrap gap-2 text-xs">
+                            <Badge variant={promo.isActive ? "default" : "secondary"}>
+                              {promo.isActive 
+                                ? (language === "tr" ? "Aktif" : "Active") 
+                                : (language === "tr" ? "Pasif" : "Inactive")}
+                            </Badge>
+                            <Badge variant="outline">
+                              {promo.remainingUses}/{promo.maxUses} {language === "tr" ? "kullanım" : "uses"}
+                            </Badge>
+                            <Badge variant="outline">
+                              {promo.premiumDays} {language === "tr" ? "gün" : "days"}
+                            </Badge>
+                            {promo.expiresAt && (
+                              <Badge variant={new Date(promo.expiresAt) < new Date() ? "destructive" : "outline"}>
+                                {new Date(promo.expiresAt) < new Date() 
+                                  ? (language === "tr" ? "Süresi Doldu" : "Expired")
+                                  : new Date(promo.expiresAt).toLocaleDateString()}
+                              </Badge>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))
+                  )}
+                </div>
+              </ScrollArea>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
