@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, boolean, integer, serial, jsonb, index } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, boolean, integer, serial, jsonb, index, uniqueIndex } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -117,12 +117,16 @@ export const promoCodes = pgTable("promo_codes", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const promoCodeRedemptions = pgTable("promo_code_redemptions", {
-  id: serial("id").primaryKey(),
-  promoCodeId: integer("promo_code_id").notNull().references(() => promoCodes.id, { onDelete: "cascade" }),
-  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  redeemedAt: timestamp("redeemed_at").notNull().defaultNow(),
-});
+export const promoCodeRedemptions = pgTable(
+  "promo_code_redemptions",
+  {
+    id: serial("id").primaryKey(),
+    promoCodeId: integer("promo_code_id").notNull().references(() => promoCodes.id, { onDelete: "cascade" }),
+    userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    redeemedAt: timestamp("redeemed_at").notNull().defaultNow(),
+  },
+  (table) => [uniqueIndex("IDX_promo_user_unique").on(table.promoCodeId, table.userId)]
+);
 
 export const insertPromoCodeSchema = createInsertSchema(promoCodes).omit({
   id: true,
