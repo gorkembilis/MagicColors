@@ -310,7 +310,7 @@ export default function Profile() {
                   </div>
                 </div>
                 <Link href="/premium">
-                  <Button className="w-full bg-gradient-to-r from-secondary to-orange-500 hover:from-secondary/90 hover:to-orange-500/90 text-white font-bold">
+                  <Button className="w-full bg-gradient-to-r from-secondary to-orange-500 hover:from-secondary/90 hover:to-orange-500/90 text-white font-bold" data-testid="button-get-premium">
                     {t("profile.getPremium")}
                   </Button>
                 </Link>
