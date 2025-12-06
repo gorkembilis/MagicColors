@@ -8,18 +8,21 @@ import { motion } from "framer-motion";
 import NotFound from "@/pages/not-found";
 import { PremiumModal } from "@/components/premium-modal";
 import { useI18n } from "@/lib/i18n";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function PackDetail() {
   const [, params] = useRoute("/pack/:id");
   const packId = params?.id;
   const pack = packs.find(p => p.id === packId);
   const { t } = useI18n();
+  const { user } = useAuth();
 
   if (!pack) return <NotFound />;
 
   const images = pack.images;
 
-  const isLocked = pack.isPremium; 
+  // Premium users have access to all packs
+  const isLocked = pack.isPremium && !user?.isPremium; 
 
   const container = {
     hidden: { opacity: 0 },

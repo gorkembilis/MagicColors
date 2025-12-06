@@ -14,6 +14,7 @@ import sliderImg3 from "@assets/generated_images/print_and_download_art.png";
 import sliderImg4 from "@assets/generated_images/share_artwork_community.png";
 import { motion, AnimatePresence } from "framer-motion";
 import { useI18n } from "@/lib/i18n";
+import { useAuth } from "@/hooks/useAuth";
 
 type DifficultyFilter = 'all' | Difficulty;
 
@@ -25,6 +26,7 @@ export default function Home() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const { t, language, setLanguage } = useI18n();
+  const { user } = useAuth();
 
   const slides = [
     {
@@ -335,7 +337,7 @@ export default function Home() {
                       alt={pack.title}
                       className="h-full w-full object-cover"
                     />
-                    {pack.isPremium && (
+                    {pack.isPremium && !user?.isPremium && (
                       <div className="absolute right-2 top-2 rounded-full bg-black/60 p-1.5 text-secondary backdrop-blur-sm">
                         <Lock className="h-3 w-3" />
                       </div>
