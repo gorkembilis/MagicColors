@@ -1,13 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { packs, Difficulty } from "@/lib/mock-data";
-import { Wand2, Lock, ArrowRight, Globe, Trophy } from "lucide-react";
+import { Wand2, Lock, ArrowRight, Globe, Trophy, Sparkles, Palette, Download, Share2, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link, useLocation } from "wouter";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useI18n } from "@/lib/i18n";
 
 type DifficultyFilter = 'all' | Difficulty;
@@ -16,7 +16,45 @@ export default function Home() {
   const [, setLocation] = useLocation();
   const [prompt, setPrompt] = useState("");
   const [difficultyFilter, setDifficultyFilter] = useState<DifficultyFilter>('all');
+  const [currentSlide, setCurrentSlide] = useState(0);
   const { t, language, setLanguage } = useI18n();
+
+  const slides = [
+    {
+      icon: Sparkles,
+      title: t("slider.slide1.title"),
+      description: t("slider.slide1.desc"),
+      color: "from-primary to-purple-500"
+    },
+    {
+      icon: Palette,
+      title: t("slider.slide2.title"),
+      description: t("slider.slide2.desc"),
+      color: "from-green-500 to-teal-500"
+    },
+    {
+      icon: Download,
+      title: t("slider.slide3.title"),
+      description: t("slider.slide3.desc"),
+      color: "from-orange-500 to-red-500"
+    },
+    {
+      icon: Share2,
+      title: t("slider.slide4.title"),
+      description: t("slider.slide4.desc"),
+      color: "from-blue-500 to-indigo-500"
+    }
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [slides.length]);
+
+  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
+  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
 
   const filteredPacks = difficultyFilter === 'all' 
     ? packs 
@@ -62,55 +100,98 @@ export default function Home() {
         </Button>
       }
     >
-      {/* Hero Section */}
-      <section className="relative overflow-hidden px-4 pt-8 pb-12">
-        <div className="text-center relative z-10">
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            <h1 className="mb-4 text-3xl font-extrabold leading-tight tracking-tight text-foreground">
-              {t('home.hero.title')} <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-purple-500 to-accent">
-                {t('home.hero.subtitle')}
-              </span>
-            </h1>
-          </motion.div>
+      {/* Hero Slider Section */}
+      <section className="relative overflow-hidden px-4 pt-6 pb-6">
+        <div className="relative">
+          {/* Slider */}
+          <div className="relative bg-gradient-to-br from-gray-50 to-white rounded-3xl p-6 shadow-sm border border-gray-100 overflow-hidden">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentSlide}
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -50 }}
+                transition={{ duration: 0.3 }}
+                className="text-center"
+              >
+                <div className={`mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br ${slides[currentSlide].color} flex items-center justify-center mb-4 shadow-lg`}>
+                  {(() => {
+                    const IconComponent = slides[currentSlide].icon;
+                    return <IconComponent className="h-8 w-8 text-white" />;
+                  })()}
+                </div>
+                <h2 className="text-xl font-bold mb-2 text-gray-800">
+                  {slides[currentSlide].title}
+                </h2>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  {slides[currentSlide].description}
+                </p>
+              </motion.div>
+            </AnimatePresence>
 
+            {/* Navigation Arrows */}
+            <button
+              onClick={prevSlide}
+              className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 shadow-md hover:bg-white transition-colors"
+              data-testid="slider-prev"
+            >
+              <ChevronLeft className="h-4 w-4 text-gray-600" />
+            </button>
+            <button
+              onClick={nextSlide}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 shadow-md hover:bg-white transition-colors"
+              data-testid="slider-next"
+            >
+              <ChevronRight className="h-4 w-4 text-gray-600" />
+            </button>
+
+            {/* Dots Indicator */}
+            <div className="flex justify-center gap-2 mt-4">
+              {slides.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentSlide(index)}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    index === currentSlide 
+                      ? "w-6 bg-primary" 
+                      : "bg-gray-300 hover:bg-gray-400"
+                  }`}
+                  data-testid={`slider-dot-${index}`}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* AI Generator Input */}
           <motion.form 
             onSubmit={handleGenerate}
-            className="relative mx-auto max-w-md mt-6"
+            className="relative mx-auto max-w-md mt-4"
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
           >
-            <div className="relative flex flex-col gap-3">
-               <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">
-                  <Wand2 className="h-5 w-5" />
+            <div className="relative flex gap-2">
+              <div className="relative flex-1">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                  <Wand2 className="h-4 w-4" />
                 </div>
                 <Input 
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
                   placeholder={t('home.hero.placeholder')}
-                  className="h-14 rounded-2xl border-2 border-border bg-white pl-12 pr-4 text-lg shadow-sm transition-all focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20"
+                  className="h-12 rounded-xl border-2 border-border bg-white pl-10 pr-4 text-sm shadow-sm transition-all focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20"
                 />
-               </div>
+              </div>
               <Button 
                 type="submit" 
                 size="lg" 
-                className="w-full h-14 rounded-2xl bg-primary font-bold text-lg hover:bg-primary/90 shadow-md"
+                className="h-12 px-6 rounded-xl bg-primary font-bold hover:bg-primary/90 shadow-md"
               >
                 {t('home.hero.button')}
               </Button>
             </div>
           </motion.form>
         </div>
-
-        {/* Decorative blobs */}
-        <div className="absolute top-0 left-0 -z-10 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-secondary/20 blur-3xl" />
-        <div className="absolute bottom-0 right-0 -z-10 h-64 w-64 translate-x-1/2 translate-y-1/2 rounded-full bg-primary/20 blur-3xl" />
       </section>
 
       {/* Contest Banner */}

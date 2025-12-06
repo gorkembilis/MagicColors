@@ -32,6 +32,16 @@ const translations: Record<Language, Record<string, string>> = {
     "home.hero.subtitle": "Coloring Pages",
     "home.hero.placeholder": "Unicorn on the moon...",
     "home.hero.button": "Create Magic ✨",
+
+    "slider.slide1.title": "AI-Powered Coloring Pages",
+    "slider.slide1.desc": "Create unique coloring pages with AI! Just describe what you want and watch the magic happen.",
+    "slider.slide2.title": "Color Digitally",
+    "slider.slide2.desc": "Use our digital canvas with fun colors and brushes. Perfect for on-the-go creativity!",
+    "slider.slide3.title": "Print & Download",
+    "slider.slide3.desc": "Download your artwork as PDF or print directly. Great for offline coloring fun!",
+    "slider.slide4.title": "Share Your Art",
+    "slider.slide4.desc": "Share your masterpieces with friends and family. Join weekly contests to win prizes!",
+
     "home.packs.title": "Explore Packs",
     "home.packs.subtitle": "Ready-to-print collections",
     "home.packs.viewAll": "View All",
@@ -224,6 +234,16 @@ const translations: Record<Language, Record<string, string>> = {
     "home.hero.subtitle": "Sayfanı Oluştur",
     "home.hero.placeholder": "Ayda dondurma yiyen kedi...",
     "home.hero.button": "Sihir Yarat ✨",
+
+    "slider.slide1.title": "AI ile Boyama Sayfası",
+    "slider.slide1.desc": "AI ile benzersiz boyama sayfaları oluştur! Ne istediğini yaz ve sihri izle.",
+    "slider.slide2.title": "Dijital Boyama",
+    "slider.slide2.desc": "Eğlenceli renkler ve fırçalarla dijital tuvalimizi kullan. Hareket halinde yaratıcılık için mükemmel!",
+    "slider.slide3.title": "İndir ve Yazdır",
+    "slider.slide3.desc": "Eserlerini PDF olarak indir veya doğrudan yazdır. Çevrimdışı boyama keyfi için harika!",
+    "slider.slide4.title": "Paylaş",
+    "slider.slide4.desc": "Başyapıtlarını arkadaşların ve ailenle paylaş. Haftalık yarışmalara katıl ve ödül kazan!",
+
     "home.packs.title": "Paketleri Keşfet",
     "home.packs.subtitle": "Yazdırmaya hazır koleksiyonlar",
     "home.packs.viewAll": "Tümü",
