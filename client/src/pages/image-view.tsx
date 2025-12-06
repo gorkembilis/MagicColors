@@ -117,7 +117,90 @@ export default function ImageView() {
   };
 
   const handlePrint = () => {
-    window.print();
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>${title}</title>
+          <style>
+            * { margin: 0; padding: 0; }
+            body { display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+            img { max-width: 100%; max-height: 100vh; object-fit: contain; }
+            @media print {
+              body { margin: 0; padding: 0; }
+              img { width: 100%; height: auto; max-height: 100vh; }
+            }
+          </style>
+        </head>
+        <body>
+          <img src="${imageUrl}" alt="${title}" onload="window.print(); window.close();" />
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
+  };
+
+  const handleDownloadPdf = async () => {
+    try {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+        img.src = imageUrl;
+      });
+
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+      }
+
+      const dataUrl = canvas.toDataURL('image/png');
+      
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        printWindow.document.write(`
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>${title}</title>
+            <style>
+              * { margin: 0; padding: 0; }
+              body { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: white; }
+              img { max-width: 100%; max-height: 100vh; object-fit: contain; }
+              @media print {
+                @page { margin: 0.5cm; }
+                body { margin: 0; padding: 0; }
+                img { width: 100%; height: auto; }
+              }
+            </style>
+          </head>
+          <body>
+            <img src="${dataUrl}" alt="${title}" />
+            <script>
+              setTimeout(() => { window.print(); }, 100);
+            </script>
+          </body>
+          </html>
+        `);
+        printWindow.document.close();
+      }
+    } catch (error) {
+      console.error('PDF download failed:', error);
+      const link = document.createElement('a');
+      link.href = imageUrl;
+      link.download = `${title.replace(/\s+/g, '-')}.png`;
+      link.click();
+    }
   };
 
   return (
@@ -216,6 +299,7 @@ export default function ImageView() {
                 variant="outline" 
                 className="w-full h-14 rounded-2xl border-2 text-lg font-bold"
                 data-testid="button-download"
+                onClick={handleDownloadPdf}
               >
                 <Download className="mr-2 h-5 w-5" /> {t('view.downloadPdf')}
               </Button>
