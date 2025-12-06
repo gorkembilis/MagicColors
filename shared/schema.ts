@@ -105,6 +105,36 @@ export const insertContestVoteSchema = createInsertSchema(contestVotes).omit({
   createdAt: true,
 });
 
+export const promoCodes = pgTable("promo_codes", {
+  id: serial("id").primaryKey(),
+  code: varchar("code").notNull().unique(),
+  description: varchar("description"),
+  maxUses: integer("max_uses").notNull().default(1),
+  remainingUses: integer("remaining_uses").notNull().default(1),
+  premiumDays: integer("premium_days").notNull().default(30),
+  expiresAt: timestamp("expires_at"),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const promoCodeRedemptions = pgTable("promo_code_redemptions", {
+  id: serial("id").primaryKey(),
+  promoCodeId: integer("promo_code_id").notNull().references(() => promoCodes.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  redeemedAt: timestamp("redeemed_at").notNull().defaultNow(),
+});
+
+export const insertPromoCodeSchema = createInsertSchema(promoCodes).omit({
+  id: true,
+  createdAt: true,
+  remainingUses: true,
+});
+
+export const insertPromoCodeRedemptionSchema = createInsertSchema(promoCodeRedemptions).omit({
+  id: true,
+  redeemedAt: true,
+});
+
 export const registerSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
@@ -130,3 +160,7 @@ export type ContestSubmission = typeof contestSubmissions.$inferSelect;
 export type InsertContestSubmission = z.infer<typeof insertContestSubmissionSchema>;
 export type ContestVote = typeof contestVotes.$inferSelect;
 export type InsertContestVote = z.infer<typeof insertContestVoteSchema>;
+export type PromoCode = typeof promoCodes.$inferSelect;
+export type InsertPromoCode = z.infer<typeof insertPromoCodeSchema>;
+export type PromoCodeRedemption = typeof promoCodeRedemptions.$inferSelect;
+export type InsertPromoCodeRedemption = z.infer<typeof insertPromoCodeRedemptionSchema>;
