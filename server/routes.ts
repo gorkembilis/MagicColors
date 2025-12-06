@@ -460,5 +460,95 @@ export async function registerRoutes(
     }
   });
 
+  // Puzzle Routes
+  app.get("/api/puzzles", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      const puzzles = await storage.getUserPuzzles(userId);
+      res.json(puzzles);
+    } catch (error) {
+      console.error("Error fetching puzzles:", error);
+      res.status(500).json({ message: "Puzzle'lar alınamadı" });
+    }
+  });
+
+  app.get("/api/puzzles/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const puzzle = await storage.getPuzzle(parseInt(id));
+      if (!puzzle) {
+        return res.status(404).json({ message: "Puzzle bulunamadı" });
+      }
+      res.json(puzzle);
+    } catch (error) {
+      console.error("Error fetching puzzle:", error);
+      res.status(500).json({ message: "Puzzle alınamadı" });
+    }
+  });
+
+  app.post("/api/puzzles", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      const { title, imageUrl, difficulty } = req.body;
+
+      if (!title || !imageUrl) {
+        return res.status(400).json({ message: "Başlık ve resim gerekli" });
+      }
+
+      const puzzle = await storage.createPuzzle({
+        userId,
+        title,
+        imageUrl,
+        difficulty: difficulty || 3,
+      });
+
+      res.json(puzzle);
+    } catch (error) {
+      console.error("Error creating puzzle:", error);
+      res.status(500).json({ message: "Puzzle oluşturulamadı" });
+    }
+  });
+
+  app.patch("/api/puzzles/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      const { id } = req.params;
+      const { isCompleted, bestTime } = req.body;
+
+      const puzzle = await storage.getPuzzle(parseInt(id));
+      if (!puzzle || puzzle.userId !== userId) {
+        return res.status(404).json({ message: "Puzzle bulunamadı" });
+      }
+
+      const updates: any = {};
+      if (typeof isCompleted === "boolean") updates.isCompleted = isCompleted;
+      if (typeof bestTime === "number") updates.bestTime = bestTime;
+
+      const updated = await storage.updatePuzzle(parseInt(id), updates);
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating puzzle:", error);
+      res.status(500).json({ message: "Puzzle güncellenemedi" });
+    }
+  });
+
+  app.delete("/api/puzzles/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      const { id } = req.params;
+
+      const puzzle = await storage.getPuzzle(parseInt(id));
+      if (!puzzle || puzzle.userId !== userId) {
+        return res.status(404).json({ message: "Puzzle bulunamadı" });
+      }
+
+      await storage.deletePuzzle(parseInt(id));
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting puzzle:", error);
+      res.status(500).json({ message: "Puzzle silinemedi" });
+    }
+  });
+
   return httpServer;
 }
