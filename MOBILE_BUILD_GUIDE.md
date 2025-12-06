@@ -59,8 +59,10 @@ AI_INTEGRATIONS_GEMINI_BASE_URL=your_gemini_base_url
 ### 3. Web Uygulamasını Build Edin
 
 ```bash
-npx vite build --outDir www
+npm run build
 ```
+
+Bu komut web uygulamasını `dist/public` klasörüne derler.
 
 ### 4. Capacitor Sync
 
@@ -199,8 +201,8 @@ const config: CapacitorConfig = {
 # Geliştirme modu
 npm run dev
 
-# Web build
-npx vite build --outDir www
+# Web build (dist/public klasörüne derler)
+npm run build
 
 # Capacitor sync
 npx cap sync

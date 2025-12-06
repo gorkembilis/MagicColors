@@ -25,7 +25,7 @@ jobs:
         run: npm ci
 
       - name: Build web app
-        run: npx vite build --outDir dist/public
+        run: npm run build
 
       - name: Setup Ruby (for CocoaPods)
         uses: ruby/setup-ruby@v1
