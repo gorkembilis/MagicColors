@@ -342,6 +342,11 @@ export default function Home() {
                         <Lock className="h-3 w-3" />
                       </div>
                     )}
+                    {pack.isPremium && user?.isPremium && (
+                      <div className="absolute right-2 top-2 rounded-full bg-gradient-to-r from-yellow-500 to-orange-500 px-2 py-0.5 text-[10px] font-bold text-white shadow-lg border border-white">
+                        Premium
+                      </div>
+                    )}
                     {!pack.isPremium && (
                       <div className="absolute right-2 top-2 rounded-full bg-green-500 px-2 py-0.5 text-[10px] font-bold text-white shadow-lg border border-white animate-pulse">
                         {t('home.packs.free')}
