@@ -30,6 +30,10 @@ Preferred communication style: Simple, everyday language.
   - User promo code redemption on premium page with atomic transaction-based validation
   - Database tables: `promo_codes` and `promo_code_redemptions` with unique constraint on (userId, promoCodeId)
   - Automatic premium status update on successful code redemption
+- **Admin Panel Separation** (December 2024):
+  - Admin panel moved to secret URL: `/mc-management-2024` (not visible in app navigation)
+  - Only accessible by users with admin role who know the direct URL
+  - Completely separate from the main user-facing application
 - **In-App Authentication** (December 2024): Replaced Replit Auth with custom email/password authentication system to avoid external redirects
 
 ## Pending Integrations
