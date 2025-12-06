@@ -19,6 +19,8 @@ import Settings from "@/pages/settings";
 import Profile from "@/pages/profile";
 import Contests from "@/pages/contests";
 import Admin from "@/pages/admin";
+import Puzzles from "@/pages/puzzles";
+import PuzzleGame from "@/pages/puzzle-game";
 
 function OnboardingGuard() {
   const hasCompletedOnboarding = localStorage.getItem("magiccolors_onboarding_complete") === "true";
@@ -46,6 +48,8 @@ function Router() {
       <Route path="/settings" component={Settings}/>
       <Route path="/profile" component={Profile}/>
       <Route path="/contests" component={Contests}/>
+      <Route path="/puzzles" component={Puzzles}/>
+      <Route path="/puzzle/:id" component={PuzzleGame}/>
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>

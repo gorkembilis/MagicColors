@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { packs, Difficulty } from "@/lib/mock-data";
-import { Wand2, Lock, ArrowRight, Globe, Trophy, Sparkles, Palette, Download, Share2, ChevronLeft, ChevronRight, Search, X } from "lucide-react";
+import { Wand2, Lock, ArrowRight, Globe, Trophy, Sparkles, Palette, Download, Share2, ChevronLeft, ChevronRight, Search, X, Puzzle } from "lucide-react";
 import { Link, useLocation } from "wouter";
 
 import sliderImg1 from "@assets/generated_images/child_coloring_with_magic.png";
@@ -242,6 +242,32 @@ export default function Home() {
                 <div>
                   <h3 className="font-bold">{t("contest.weeklyContest")}</h3>
                   <p className="text-sm opacity-90">{t("contest.joinNow")}</p>
+                </div>
+              </div>
+              <ArrowRight className="h-5 w-5" />
+            </div>
+          </motion.div>
+        </Link>
+      </section>
+
+      {/* Puzzle Banner */}
+      <section className="px-4 pb-4">
+        <Link href="/puzzles">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.1 }}
+            className="bg-gradient-to-r from-indigo-500 to-cyan-500 rounded-2xl p-4 text-white cursor-pointer hover:shadow-lg transition-shadow"
+            data-testid="banner-puzzle"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-full bg-white/20">
+                  <Puzzle className="h-6 w-6" />
+                </div>
+                <div>
+                  <h3 className="font-bold">{t("nav.puzzles")}</h3>
+                  <p className="text-sm opacity-90">{t("puzzle.createFromImage")}</p>
                 </div>
               </div>
               <ArrowRight className="h-5 w-5" />
