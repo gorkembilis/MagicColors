@@ -7,6 +7,11 @@ import { Badge } from "@/components/ui/badge";
 import { packs, Difficulty } from "@/lib/mock-data";
 import { Wand2, Lock, ArrowRight, Globe, Trophy, Sparkles, Palette, Download, Share2, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link, useLocation } from "wouter";
+
+import sliderImg1 from "@assets/generated_images/child_coloring_with_magic.png";
+import sliderImg2 from "@assets/generated_images/digital_coloring_tablet.png";
+import sliderImg3 from "@assets/generated_images/print_and_download_art.png";
+import sliderImg4 from "@assets/generated_images/share_artwork_community.png";
 import { motion, AnimatePresence } from "framer-motion";
 import { useI18n } from "@/lib/i18n";
 
@@ -24,25 +29,29 @@ export default function Home() {
       icon: Sparkles,
       title: t("slider.slide1.title"),
       description: t("slider.slide1.desc"),
-      color: "from-primary to-purple-500"
+      color: "from-primary to-purple-500",
+      image: sliderImg1
     },
     {
       icon: Palette,
       title: t("slider.slide2.title"),
       description: t("slider.slide2.desc"),
-      color: "from-green-500 to-teal-500"
+      color: "from-green-500 to-teal-500",
+      image: sliderImg2
     },
     {
       icon: Download,
       title: t("slider.slide3.title"),
       description: t("slider.slide3.desc"),
-      color: "from-orange-500 to-red-500"
+      color: "from-orange-500 to-red-500",
+      image: sliderImg3
     },
     {
       icon: Share2,
       title: t("slider.slide4.title"),
       description: t("slider.slide4.desc"),
-      color: "from-blue-500 to-indigo-500"
+      color: "from-blue-500 to-indigo-500",
+      image: sliderImg4
     }
   ];
 
@@ -104,7 +113,7 @@ export default function Home() {
       <section className="relative overflow-hidden px-4 pt-6 pb-6">
         <div className="relative">
           {/* Slider */}
-          <div className="relative bg-gradient-to-br from-gray-50 to-white rounded-3xl p-6 shadow-sm border border-gray-100 overflow-hidden">
+          <div className="relative rounded-3xl overflow-hidden shadow-lg">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentSlide}
@@ -112,49 +121,64 @@ export default function Home() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -50 }}
                 transition={{ duration: 0.3 }}
-                className="text-center"
+                className="relative"
               >
-                <div className={`mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br ${slides[currentSlide].color} flex items-center justify-center mb-4 shadow-lg`}>
-                  {(() => {
-                    const IconComponent = slides[currentSlide].icon;
-                    return <IconComponent className="h-8 w-8 text-white" />;
-                  })()}
+                {/* Background Image */}
+                <div className="relative h-48 overflow-hidden">
+                  <img 
+                    src={slides[currentSlide].image} 
+                    alt={slides[currentSlide].title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
                 </div>
-                <h2 className="text-xl font-bold mb-2 text-gray-800">
-                  {slides[currentSlide].title}
-                </h2>
-                <p className="text-sm text-gray-600 leading-relaxed">
-                  {slides[currentSlide].description}
-                </p>
+                
+                {/* Content Overlay */}
+                <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${slides[currentSlide].color} flex items-center justify-center shadow-lg`}>
+                      {(() => {
+                        const IconComponent = slides[currentSlide].icon;
+                        return <IconComponent className="h-5 w-5 text-white" />;
+                      })()}
+                    </div>
+                    <h2 className="text-lg font-bold">
+                      {slides[currentSlide].title}
+                    </h2>
+                  </div>
+                  <p className="text-sm text-white/90 leading-relaxed">
+                    {slides[currentSlide].description}
+                  </p>
+                </div>
               </motion.div>
             </AnimatePresence>
 
             {/* Navigation Arrows */}
             <button
               onClick={prevSlide}
-              className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 shadow-md hover:bg-white transition-colors"
+              className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/90 shadow-md hover:bg-white transition-colors z-10"
               data-testid="slider-prev"
             >
               <ChevronLeft className="h-4 w-4 text-gray-600" />
             </button>
             <button
               onClick={nextSlide}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 shadow-md hover:bg-white transition-colors"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/90 shadow-md hover:bg-white transition-colors z-10"
               data-testid="slider-next"
             >
               <ChevronRight className="h-4 w-4 text-gray-600" />
             </button>
 
             {/* Dots Indicator */}
-            <div className="flex justify-center gap-2 mt-4">
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-2 z-10">
               {slides.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentSlide(index)}
                   className={`w-2 h-2 rounded-full transition-all ${
                     index === currentSlide 
-                      ? "w-6 bg-primary" 
-                      : "bg-gray-300 hover:bg-gray-400"
+                      ? "w-6 bg-white" 
+                      : "bg-white/50 hover:bg-white/70"
                   }`}
                   data-testid={`slider-dot-${index}`}
                 />
