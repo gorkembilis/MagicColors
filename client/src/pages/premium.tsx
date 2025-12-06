@@ -1,11 +1,46 @@
+import { useState } from "react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Button } from "@/components/ui/button";
-import { Crown, Check, Star, Sparkles } from "lucide-react";
+import { Crown, Check, Star, Sparkles, Ticket, Gift } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { useI18n } from "@/lib/i18n";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Premium() {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const [promoCode, setPromoCode] = useState("");
+
+  const redeemMutation = useMutation({
+    mutationFn: async (code: string) => {
+      const res = await apiRequest("POST", "/api/promo/redeem", { code });
+      return res.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      setPromoCode("");
+      toast({
+        title: language === "tr" ? "Başarılı!" : "Success!",
+        description: language === "tr" 
+          ? `Premium ${data.premiumDays} gün aktif edildi!` 
+          : `Premium activated for ${data.premiumDays} days!`,
+      });
+    },
+    onError: (error: any) => {
+      const message = error?.message || (language === "tr" ? "Kod geçersiz veya süresi dolmuş" : "Invalid or expired code");
+      toast({
+        title: language === "tr" ? "Hata" : "Error",
+        description: message,
+        variant: "destructive",
+      });
+    },
+  });
   return (
     <MobileLayout headerTitle={t('premium.title')}>
       <div className="p-4 pb-8">
@@ -65,6 +100,46 @@ export default function Premium() {
             </div>
           </Card>
         </div>
+
+        {/* Promo Code Section */}
+        <Card className="p-4 border-none shadow-sm bg-white mb-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+              <Gift className="h-5 w-5" />
+            </div>
+            <div>
+              <h4 className="font-bold">{language === "tr" ? "Promosyon Kodu" : "Promo Code"}</h4>
+              <p className="text-xs text-muted-foreground">
+                {language === "tr" ? "Kodunuz varsa buraya girin" : "Enter your code if you have one"}
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Input
+              value={promoCode}
+              onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+              placeholder={language === "tr" ? "KOD GİRİN" : "ENTER CODE"}
+              className="font-mono uppercase"
+              data-testid="input-promo-code"
+            />
+            <Button
+              onClick={() => promoCode && redeemMutation.mutate(promoCode)}
+              disabled={!promoCode || redeemMutation.isPending || !user}
+              data-testid="button-redeem-promo"
+            >
+              {redeemMutation.isPending ? (
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              ) : (
+                <Ticket className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+          {!user && (
+            <p className="text-xs text-muted-foreground mt-2">
+              {language === "tr" ? "Kod kullanmak için giriş yapın" : "Login to redeem codes"}
+            </p>
+          )}
+        </Card>
 
         {/* Restore Purchase */}
         <div className="text-center">
