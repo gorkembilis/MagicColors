@@ -240,5 +240,117 @@ export async function registerRoutes(
     }
   });
 
+  app.get("/api/contests/active", async (req, res) => {
+    try {
+      const contest = await storage.getActiveContest();
+      if (!contest) {
+        return res.json(null);
+      }
+      const submissions = await storage.getContestSubmissions(contest.id);
+      res.json({ contest, submissions });
+    } catch (error) {
+      console.error("Error fetching active contest:", error);
+      res.status(500).json({ message: "Yarışma alınamadı" });
+    }
+  });
+
+  app.get("/api/contests/:id/leaderboard", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const leaderboard = await storage.getLeaderboard(parseInt(id));
+      res.json(leaderboard);
+    } catch (error) {
+      console.error("Error fetching leaderboard:", error);
+      res.status(500).json({ message: "Liderlik tablosu alınamadı" });
+    }
+  });
+
+  app.post("/api/contests/:id/submit", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      const { id } = req.params;
+      const { imageUrl, title } = req.body;
+
+      if (!imageUrl) {
+        return res.status(400).json({ message: "imageUrl gerekli" });
+      }
+
+      const submission = await storage.createContestSubmission({
+        contestId: parseInt(id),
+        userId,
+        imageUrl,
+        title,
+      });
+
+      res.json(submission);
+    } catch (error) {
+      console.error("Error submitting to contest:", error);
+      res.status(500).json({ message: "Eser gönderilemedi" });
+    }
+  });
+
+  app.post("/api/contests/submissions/:id/vote", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      const { id } = req.params;
+
+      const success = await storage.voteForSubmission(parseInt(id), userId);
+      if (!success) {
+        return res.status(400).json({ message: "Bu esere zaten oy verdiniz" });
+      }
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error voting:", error);
+      res.status(500).json({ message: "Oy verilemedi" });
+    }
+  });
+
+  app.get("/api/contests/submissions/:id/voted", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      const { id } = req.params;
+
+      const hasVoted = await storage.hasUserVoted(parseInt(id), userId);
+      res.json({ hasVoted });
+    } catch (error) {
+      console.error("Error checking vote:", error);
+      res.status(500).json({ message: "Oy durumu kontrol edilemedi" });
+    }
+  });
+
+  app.post("/api/admin/contests", isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const { theme, themeKey, startDate, endDate } = req.body;
+
+      if (!theme || !themeKey || !startDate || !endDate) {
+        return res.status(400).json({ message: "Tüm alanlar gerekli" });
+      }
+
+      const contest = await storage.createContest({
+        theme,
+        themeKey,
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
+        isActive: true,
+      });
+
+      res.json(contest);
+    } catch (error) {
+      console.error("Error creating contest:", error);
+      res.status(500).json({ message: "Yarışma oluşturulamadı" });
+    }
+  });
+
+  app.get("/api/admin/contests", isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const contests = await storage.getAllContests();
+      res.json(contests);
+    } catch (error) {
+      console.error("Error fetching contests:", error);
+      res.status(500).json({ message: "Yarışmalar alınamadı" });
+    }
+  });
+
   return httpServer;
 }

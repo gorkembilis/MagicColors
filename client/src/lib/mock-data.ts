@@ -97,12 +97,15 @@ export interface PackImage {
   title: string;
 }
 
+export type Difficulty = 'easy' | 'medium' | 'hard';
+
 export interface Pack {
   id: string;
   title: string;
   cover: string;
   isPremium: boolean;
   count: number;
+  difficulty: Difficulty;
   images: PackImage[];
 }
 
@@ -133,6 +136,7 @@ export const packs: Pack[] = [
     cover: animalsCover,
     isPremium: false,
     count: 10,
+    difficulty: "easy",
     images: createImages("animals", "Cute Animals", [
       lionImg, elephantImg, monkeyImg, giraffeImg, zebraImg, 
       tigerImg, bearImg, rabbitImg, dogImg, catImg
@@ -144,6 +148,7 @@ export const packs: Pack[] = [
     cover: carsCover,
     isPremium: false,
     count: 10,
+    difficulty: "easy",
     images: createImages("cars", "Cool Cars", [
       raceCarImg, truckImg, policeCarImg, fireTruckImg, busImg,
       tractorImg, motorcycleImg, jeepImg, trainImg, planeImg
@@ -155,6 +160,7 @@ export const packs: Pack[] = [
     cover: fruitsCover,
     isPremium: false,
     count: 10,
+    difficulty: "easy",
     images: createImages("fruits", "Yummy Fruits", [appleImg, bananaImg, strawberryImg, orangeImg], 10)
   },
   {
@@ -163,6 +169,7 @@ export const packs: Pack[] = [
     cover: dinosCover,
     isPremium: false,
     count: 10,
+    difficulty: "medium",
     images: createImages("dinos", "Dino World", [trexImg, stegoImg, triceratopsImg, brachiosaurusImg], 10)
   },
   {
@@ -171,6 +178,7 @@ export const packs: Pack[] = [
     cover: princessCover,
     isPremium: true,
     count: 15,
+    difficulty: "medium",
     images: createImages("princess", "Princess Castle", [castleImg, princessImg], 15)
   },
   {
@@ -179,6 +187,7 @@ export const packs: Pack[] = [
     cover: spaceCover,
     isPremium: true,
     count: 12,
+    difficulty: "hard",
     images: createImages("space", "Space Explorer", [rocketImg, astronautImg], 12)
   },
   {
@@ -187,6 +196,7 @@ export const packs: Pack[] = [
     cover: creaturesCover,
     isPremium: true,
     count: 20,
+    difficulty: "medium",
     images: createImages("pokemon", "Poke-Style", [creatureImg, creature2Img], 20)
   },
   {
@@ -195,6 +205,7 @@ export const packs: Pack[] = [
     cover: superheroCover,
     isPremium: true,
     count: 10,
+    difficulty: "hard",
     images: createImages("superhero", "Super Heroes", [superheroImg, superheroGirlImg], 10)
   },
   {
@@ -203,6 +214,7 @@ export const packs: Pack[] = [
     cover: seaCreaturesCover,
     isPremium: false,
     count: 10,
+    difficulty: "easy",
     images: createImages("seacreatures", "Sea Creatures", [
       dolphinImg, octopusImg, fishImg, jellyfishImg, seaTurtleImg
     ], 10)
@@ -213,6 +225,7 @@ export const packs: Pack[] = [
     cover: birdsCover,
     isPremium: false,
     count: 10,
+    difficulty: "medium",
     images: createImages("birds", "Birds", [
       parrotImg, owlImg, flamingoImg, peacockImg, penguinImg
     ], 10)
@@ -223,6 +236,7 @@ export const packs: Pack[] = [
     cover: sportsCover,
     isPremium: true,
     count: 10,
+    difficulty: "medium",
     images: createImages("sports", "Sports", [
       soccerImg, basketballImg, swimmingImg, bicycleImg, tennisImg
     ], 10)
@@ -233,6 +247,7 @@ export const packs: Pack[] = [
     cover: musicCover,
     isPremium: true,
     count: 10,
+    difficulty: "hard",
     images: createImages("music", "Music", [
       guitarImg, pianoImg, drumsImg, violinImg, trumpetImg
     ], 10)

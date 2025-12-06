@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { I18nProvider } from "@/lib/i18n";
+import { SoundProvider } from "@/lib/sounds";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Generator from "@/pages/generator";
@@ -17,6 +18,7 @@ import Onboarding from "@/pages/onboarding";
 import Coloring from "@/pages/coloring";
 import Settings from "@/pages/settings";
 import Profile from "@/pages/profile";
+import Contests from "@/pages/contests";
 
 function OnboardingGuard() {
   const hasCompletedOnboarding = localStorage.getItem("magiccolors_onboarding_complete") === "true";
@@ -43,6 +45,7 @@ function Router() {
       <Route path="/premium" component={Premium}/>
       <Route path="/settings" component={Settings}/>
       <Route path="/profile" component={Profile}/>
+      <Route path="/contests" component={Contests}/>
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
@@ -52,12 +55,14 @@ function Router() {
 function App() {
   return (
     <I18nProvider>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
-      </QueryClientProvider>
+      <SoundProvider>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+          </TooltipProvider>
+        </QueryClientProvider>
+      </SoundProvider>
     </I18nProvider>
   );
 }

@@ -2,12 +2,20 @@ import {
   users,
   generatedImages,
   favorites,
+  contests,
+  contestSubmissions,
+  contestVotes,
   type User,
   type UpsertUser,
   type GeneratedImage,
   type InsertGeneratedImage,
   type Favorite,
   type InsertFavorite,
+  type Contest,
+  type InsertContest,
+  type ContestSubmission,
+  type InsertContestSubmission,
+  type ContestVote,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, count, sql, and } from "drizzle-orm";
@@ -31,6 +39,15 @@ export interface IStorage {
   getAllGeneratedImages(): Promise<(GeneratedImage & { userEmail?: string | null })[]>;
   deleteGeneratedImage(id: number): Promise<boolean>;
   getStats(): Promise<{ totalUsers: number; totalImages: number; premiumUsers: number }>;
+  
+  getActiveContest(): Promise<Contest | undefined>;
+  getAllContests(): Promise<Contest[]>;
+  createContest(contest: InsertContest): Promise<Contest>;
+  getContestSubmissions(contestId: number): Promise<(ContestSubmission & { userName?: string | null })[]>;
+  createContestSubmission(submission: InsertContestSubmission): Promise<ContestSubmission>;
+  voteForSubmission(submissionId: number, voterId: string): Promise<boolean>;
+  hasUserVoted(submissionId: number, voterId: string): Promise<boolean>;
+  getLeaderboard(contestId: number): Promise<(ContestSubmission & { userName?: string | null })[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -178,6 +195,77 @@ export class DatabaseStorage implements IStorage {
       totalImages: imageCount?.count || 0,
       premiumUsers: premiumCount?.count || 0,
     };
+  }
+
+  async getActiveContest(): Promise<Contest | undefined> {
+    const now = new Date();
+    const [contest] = await db
+      .select()
+      .from(contests)
+      .where(and(eq(contests.isActive, true), sql`${contests.endDate} > ${now}`))
+      .orderBy(desc(contests.startDate))
+      .limit(1);
+    return contest;
+  }
+
+  async getAllContests(): Promise<Contest[]> {
+    return await db.select().from(contests).orderBy(desc(contests.startDate));
+  }
+
+  async createContest(contestData: InsertContest): Promise<Contest> {
+    const [contest] = await db.insert(contests).values(contestData).returning();
+    return contest;
+  }
+
+  async getContestSubmissions(contestId: number): Promise<(ContestSubmission & { userName?: string | null })[]> {
+    const submissions = await db
+      .select({
+        id: contestSubmissions.id,
+        contestId: contestSubmissions.contestId,
+        userId: contestSubmissions.userId,
+        imageUrl: contestSubmissions.imageUrl,
+        title: contestSubmissions.title,
+        voteCount: contestSubmissions.voteCount,
+        createdAt: contestSubmissions.createdAt,
+        userName: users.firstName,
+      })
+      .from(contestSubmissions)
+      .leftJoin(users, eq(contestSubmissions.userId, users.id))
+      .where(eq(contestSubmissions.contestId, contestId))
+      .orderBy(desc(contestSubmissions.voteCount));
+    return submissions;
+  }
+
+  async createContestSubmission(submissionData: InsertContestSubmission): Promise<ContestSubmission> {
+    const [submission] = await db
+      .insert(contestSubmissions)
+      .values(submissionData)
+      .returning();
+    return submission;
+  }
+
+  async voteForSubmission(submissionId: number, voterId: string): Promise<boolean> {
+    const hasVoted = await this.hasUserVoted(submissionId, voterId);
+    if (hasVoted) return false;
+
+    await db.insert(contestVotes).values({ submissionId, voterId });
+    await db
+      .update(contestSubmissions)
+      .set({ voteCount: sql`${contestSubmissions.voteCount} + 1` })
+      .where(eq(contestSubmissions.id, submissionId));
+    return true;
+  }
+
+  async hasUserVoted(submissionId: number, voterId: string): Promise<boolean> {
+    const [vote] = await db
+      .select()
+      .from(contestVotes)
+      .where(and(eq(contestVotes.submissionId, submissionId), eq(contestVotes.voterId, voterId)));
+    return !!vote;
+  }
+
+  async getLeaderboard(contestId: number): Promise<(ContestSubmission & { userName?: string | null })[]> {
+    return this.getContestSubmissions(contestId);
   }
 }
 

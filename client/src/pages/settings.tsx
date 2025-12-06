@@ -4,7 +4,8 @@ import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useI18n } from "@/lib/i18n";
-import { ArrowLeft, Bell, Palette, Globe, Moon, ChevronRight } from "lucide-react";
+import { useSound } from "@/lib/sounds";
+import { ArrowLeft, Bell, Palette, Globe, Volume2, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface NotificationSettings {
@@ -16,6 +17,7 @@ interface NotificationSettings {
 export default function Settings() {
   const [, setLocation] = useLocation();
   const { t, language, setLanguage } = useI18n();
+  const { soundEnabled, setSoundEnabled, playClick } = useSound();
   
   const [notifications, setNotifications] = useState<NotificationSettings>(() => {
     const saved = localStorage.getItem("magiccolors_notifications");
@@ -126,6 +128,35 @@ export default function Settings() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
+            className="bg-white rounded-2xl p-4 shadow-sm"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 rounded-xl bg-green-100">
+                <Volume2 className="h-5 w-5 text-green-600" />
+              </div>
+              <h2 className="font-bold text-lg">{t("settings.sounds")}</h2>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium">{t("settings.soundEffects")}</p>
+                <p className="text-sm text-muted-foreground">{t("settings.soundEffectsDesc")}</p>
+              </div>
+              <Switch
+                checked={soundEnabled}
+                onCheckedChange={(v) => {
+                  setSoundEnabled(v);
+                  if (v) playClick();
+                }}
+                data-testid="switch-sounds"
+              />
+            </div>
+          </motion.section>
+
+          <motion.section 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
             className="bg-white rounded-2xl p-4 shadow-sm"
           >
             <div className="flex items-center gap-3 mb-4">

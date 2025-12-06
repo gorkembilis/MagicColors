@@ -45,6 +45,33 @@ export const favorites = pgTable("favorites", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const contests = pgTable("contests", {
+  id: serial("id").primaryKey(),
+  theme: varchar("theme").notNull(),
+  themeKey: varchar("theme_key").notNull(),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const contestSubmissions = pgTable("contest_submissions", {
+  id: serial("id").primaryKey(),
+  contestId: integer("contest_id").notNull().references(() => contests.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  imageUrl: text("image_url").notNull(),
+  title: varchar("title"),
+  voteCount: integer("vote_count").notNull().default(0),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const contestVotes = pgTable("contest_votes", {
+  id: serial("id").primaryKey(),
+  submissionId: integer("submission_id").notNull().references(() => contestSubmissions.id, { onDelete: "cascade" }),
+  voterId: varchar("voter_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
@@ -58,6 +85,22 @@ export const insertGeneratedImageSchema = createInsertSchema(generatedImages).om
 });
 
 export const insertFavoriteSchema = createInsertSchema(favorites).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertContestSchema = createInsertSchema(contests).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertContestSubmissionSchema = createInsertSchema(contestSubmissions).omit({
+  id: true,
+  createdAt: true,
+  voteCount: true,
+});
+
+export const insertContestVoteSchema = createInsertSchema(contestVotes).omit({
   id: true,
   createdAt: true,
 });
@@ -81,3 +124,9 @@ export type GeneratedImage = typeof generatedImages.$inferSelect;
 export type InsertGeneratedImage = z.infer<typeof insertGeneratedImageSchema>;
 export type Favorite = typeof favorites.$inferSelect;
 export type InsertFavorite = z.infer<typeof insertFavoriteSchema>;
+export type Contest = typeof contests.$inferSelect;
+export type InsertContest = z.infer<typeof insertContestSchema>;
+export type ContestSubmission = typeof contestSubmissions.$inferSelect;
+export type InsertContestSubmission = z.infer<typeof insertContestSubmissionSchema>;
+export type ContestVote = typeof contestVotes.$inferSelect;
+export type InsertContestVote = z.infer<typeof insertContestVoteSchema>;

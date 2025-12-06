@@ -2,7 +2,9 @@ import { useState, useRef, useEffect } from "react";
 import { useRoute, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
-import { ArrowLeft, Eraser, Undo2, Download, Share2, Trash2 } from "lucide-react";
+import { useSound } from "@/lib/sounds";
+import { CelebrationModal } from "@/components/Confetti";
+import { ArrowLeft, Eraser, Undo2, Download, Share2, Trash2, Check } from "lucide-react";
 import { packs } from "@/lib/mock-data";
 import { motion } from "framer-motion";
 
@@ -18,6 +20,7 @@ export default function Coloring() {
   const [, params] = useRoute("/coloring/:id");
   const [, setLocation] = useLocation();
   const { t } = useI18n();
+  const { playColorSelect, playBrushStroke, playCelebration, playClick } = useSound();
   
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -29,6 +32,7 @@ export default function Coloring() {
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
+  const [showCelebration, setShowCelebration] = useState(false);
 
   const imageId = params?.id;
   
@@ -180,6 +184,7 @@ export default function Coloring() {
     if (isDrawing) {
       setIsDrawing(false);
       saveToHistory();
+      playBrushStroke();
     }
   };
 
@@ -191,6 +196,11 @@ export default function Coloring() {
     link.download = `magiccolors-${imageId}.png`;
     link.href = canvas.toDataURL("image/png");
     link.click();
+  };
+
+  const handleFinish = () => {
+    playCelebration();
+    setShowCelebration(true);
   };
 
   const shareImage = async () => {
@@ -227,6 +237,13 @@ export default function Coloring() {
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
+      <CelebrationModal 
+        isOpen={showCelebration} 
+        onClose={() => setShowCelebration(false)}
+        title={t("coloring.celebration")}
+        subtitle={t("coloring.celebrationDesc")}
+        buttonText={t("coloring.continue")}
+      />
       <header className="bg-white shadow-sm px-4 py-3 flex items-center justify-between">
         <Button
           variant="ghost"
@@ -302,6 +319,7 @@ export default function Coloring() {
               onClick={() => {
                 setCurrentColor(color);
                 setIsEraser(false);
+                playColorSelect();
               }}
               data-testid={`color-${color.replace("#", "")}`}
             />
@@ -344,6 +362,15 @@ export default function Coloring() {
             {t("coloring.share")}
           </Button>
         </div>
+        
+        <Button
+          className="w-full bg-green-500 hover:bg-green-600"
+          onClick={handleFinish}
+          data-testid="button-finish"
+        >
+          <Check className="h-4 w-4 mr-2" />
+          {t("coloring.finish")}
+        </Button>
       </div>
     </div>
   );

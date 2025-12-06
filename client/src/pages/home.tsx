@@ -4,16 +4,29 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { packs } from "@/lib/mock-data";
-import { Wand2, Lock, ArrowRight, Globe } from "lucide-react";
+import { packs, Difficulty } from "@/lib/mock-data";
+import { Wand2, Lock, ArrowRight, Globe, Trophy } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { useI18n } from "@/lib/i18n";
 
+type DifficultyFilter = 'all' | Difficulty;
+
 export default function Home() {
   const [, setLocation] = useLocation();
   const [prompt, setPrompt] = useState("");
+  const [difficultyFilter, setDifficultyFilter] = useState<DifficultyFilter>('all');
   const { t, language, setLanguage } = useI18n();
+
+  const filteredPacks = difficultyFilter === 'all' 
+    ? packs 
+    : packs.filter(p => p.difficulty === difficultyFilter);
+
+  const difficultyColors: Record<Difficulty, string> = {
+    easy: "bg-green-100 text-green-700 border-green-200",
+    medium: "bg-yellow-100 text-yellow-700 border-yellow-200",
+    hard: "bg-red-100 text-red-700 border-red-200"
+  };
 
   const handleGenerate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,9 +113,34 @@ export default function Home() {
         <div className="absolute bottom-0 right-0 -z-10 h-64 w-64 translate-x-1/2 translate-y-1/2 rounded-full bg-primary/20 blur-3xl" />
       </section>
 
+      {/* Contest Banner */}
+      <section className="px-4 pb-4">
+        <Link href="/contests">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-gradient-to-r from-purple-500 to-primary rounded-2xl p-4 text-white cursor-pointer hover:shadow-lg transition-shadow"
+            data-testid="banner-contest"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-full bg-white/20">
+                  <Trophy className="h-6 w-6" />
+                </div>
+                <div>
+                  <h3 className="font-bold">{t("contest.weeklyContest")}</h3>
+                  <p className="text-sm opacity-90">{t("contest.joinNow")}</p>
+                </div>
+              </div>
+              <ArrowRight className="h-5 w-5" />
+            </div>
+          </motion.div>
+        </Link>
+      </section>
+
       {/* Packs Section */}
       <section className="px-4 pb-8">
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-4 flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold">{t('home.packs.title')}</h2>
             <p className="text-xs text-muted-foreground">{t('home.packs.subtitle')}</p>
@@ -112,13 +150,31 @@ export default function Home() {
           </Button>
         </div>
 
+        {/* Difficulty Filter */}
+        <div className="mb-4 flex gap-2 overflow-x-auto pb-2">
+          {(['all', 'easy', 'medium', 'hard'] as const).map((diff) => (
+            <Button
+              key={diff}
+              variant={difficultyFilter === diff ? "default" : "outline"}
+              size="sm"
+              onClick={() => setDifficultyFilter(diff)}
+              className={`h-8 px-3 text-xs font-medium rounded-full whitespace-nowrap ${
+                difficultyFilter === diff ? "" : "bg-white"
+              }`}
+              data-testid={`filter-difficulty-${diff}`}
+            >
+              {t(`difficulty.${diff}`)}
+            </Button>
+          ))}
+        </div>
+
         <motion.div 
           variants={container}
           initial="hidden"
           animate="show"
           className="grid grid-cols-2 gap-3"
         >
-          {packs.map((pack) => (
+          {filteredPacks.map((pack) => (
             <motion.div key={pack.id} variants={item}>
               <Link href={`/pack/${pack.id}`}>
                 <Card className="group cursor-pointer overflow-hidden border-none shadow-sm transition-all hover:-translate-y-1 hover:shadow-md bg-white active:scale-95 duration-100">
@@ -138,6 +194,10 @@ export default function Home() {
                         {t('home.packs.free')}
                       </div>
                     )}
+                    {/* Difficulty Badge */}
+                    <div className={`absolute left-2 top-2 rounded-full px-2 py-0.5 text-[10px] font-bold border ${difficultyColors[pack.difficulty]}`}>
+                      {t(`difficulty.${pack.difficulty}`)}
+                    </div>
                   </div>
                   <CardContent className="p-3">
                     <h3 className="mb-0.5 text-sm font-bold leading-none truncate">{t(`pack.${pack.id}`)}</h3>
