@@ -13,7 +13,7 @@ import farmCover from "@assets/generated_images/farm_coloring_cover.png";
 import shapesCover from "@assets/generated_images/shapes_coloring_cover.png";
 import weatherCover from "@assets/generated_images/weather_coloring_cover.png";
 import jungleCover from "@assets/generated_images/jungle_coloring_cover.png";
-import robotsCover from "@assets/generated_images/robots_coloring_cover.png";
+import robotsCover from "@assets/generated_images/colorful_robots_cover.png";
 import knightsCover from "@assets/generated_images/knights_coloring_cover.png";
 import piratesCover from "@assets/generated_images/pirates_coloring_cover.png";
 import dragonsCover from "@assets/generated_images/dragons_coloring_cover.png";
@@ -211,6 +211,26 @@ import sunImg from "@assets/generated_images/sun_coloring_page.png";
 import rainbowImg from "@assets/generated_images/rainbow_coloring_page.png";
 import jungleLionImg from "@assets/generated_images/jungle_lion_page.png";
 import robotImg from "@assets/generated_images/robot_coloring_page.png";
+import helperRobotImg from "@assets/generated_images/helper_robot_coloring.png";
+import flyingRobotImg from "@assets/generated_images/flying_robot_coloring.png";
+import robotDogImg from "@assets/generated_images/robot_dog_coloring.png";
+import chefRobotImg from "@assets/generated_images/chef_robot_coloring.png";
+import dancingRobotImg from "@assets/generated_images/dancing_robot_coloring.png";
+import spaceRobotImg from "@assets/generated_images/space_robot_coloring.png";
+import builderRobotImg from "@assets/generated_images/builder_robot_coloring.png";
+import musicRobotImg from "@assets/generated_images/music_robot_coloring.png";
+import scientistRobotImg from "@assets/generated_images/scientist_robot_coloring.png";
+import sportsRobotImg from "@assets/generated_images/sports_robot_coloring.png";
+import gardenerRobotImg from "@assets/generated_images/gardener_robot_coloring.png";
+import superheroRobotImg from "@assets/generated_images/superhero_robot_coloring.png";
+import painterRobotImg from "@assets/generated_images/painter_robot_coloring.png";
+import doctorRobotImg from "@assets/generated_images/doctor_robot_coloring.png";
+import firefighterRobotImg from "@assets/generated_images/firefighter_robot_coloring.png";
+import teacherRobotImg from "@assets/generated_images/teacher_robot_coloring.png";
+import pirateRobotImg from "@assets/generated_images/pirate_robot_coloring.png";
+import ninjaRobotImg from "@assets/generated_images/ninja_robot_coloring.png";
+import magicianRobotImg from "@assets/generated_images/magician_robot_coloring.png";
+import detectiveRobotImg from "@assets/generated_images/detective_robot_coloring.png";
 import knightImg from "@assets/generated_images/knight_coloring_page.png";
 import pirateImg from "@assets/generated_images/pirate_coloring_page.png";
 import dragonImg from "@assets/generated_images/dragon_coloring_page.png";
@@ -540,10 +560,10 @@ export const packs: Pack[] = [
     count: 20,
     difficulty: "medium",
     images: createImages("robots", "Robots", [
-      robotImg, robotImg, robotImg, robotImg, robotImg,
-      robotImg, robotImg, robotImg, robotImg, robotImg,
-      robotImg, robotImg, robotImg, robotImg, robotImg,
-      robotImg, robotImg, robotImg, robotImg, robotImg
+      helperRobotImg, flyingRobotImg, robotDogImg, chefRobotImg, dancingRobotImg,
+      spaceRobotImg, builderRobotImg, musicRobotImg, scientistRobotImg, sportsRobotImg,
+      gardenerRobotImg, superheroRobotImg, painterRobotImg, doctorRobotImg, firefighterRobotImg,
+      teacherRobotImg, pirateRobotImg, ninjaRobotImg, magicianRobotImg, detectiveRobotImg
     ], 20)
   },
   {
