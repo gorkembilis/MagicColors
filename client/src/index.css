@@ -51,6 +51,36 @@
   --color-chart-5: 270 70% 65%;
 }
 
+.dark {
+  --color-background: 220 20% 10%;
+  --color-foreground: 220 10% 95%;
+
+  --color-card: 220 20% 15%;
+  --color-card-foreground: 220 10% 95%;
+
+  --color-popover: 220 20% 15%;
+  --color-popover-foreground: 220 10% 95%;
+
+  --color-primary: 330 85% 65%;
+  --color-primary-foreground: 0 0% 100%;
+
+  --color-secondary: 45 95% 55%;
+  --color-secondary-foreground: 30 80% 10%;
+
+  --color-accent: 190 85% 55%;
+  --color-accent-foreground: 200 90% 95%;
+
+  --color-muted: 220 20% 20%;
+  --color-muted-foreground: 220 10% 70%;
+
+  --color-destructive: 0 85% 55%;
+  --color-destructive-foreground: 0 0% 100%;
+
+  --color-border: 220 15% 25%;
+  --color-input: 220 15% 25%;
+  --color-ring: 330 85% 65%;
+}
+
 @layer base {
   * {
     @apply border-border;

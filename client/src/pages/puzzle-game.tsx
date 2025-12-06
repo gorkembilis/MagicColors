@@ -205,7 +205,7 @@ export default function PuzzleGame() {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="text-center">
-          <p className="text-gray-500 mb-4">Puzzle bulunamadı</p>
+          <p className="text-muted-foreground mb-4">Puzzle bulunamadı</p>
           <Button onClick={() => navigate("/puzzles")} data-testid="button-back">
             {t("puzzle.back")}
           </Button>
@@ -215,8 +215,8 @@ export default function PuzzleGame() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-pink-50 pb-24">
-      <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-sm border-b px-4 py-3">
+    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-pink-50 dark:from-slate-900 dark:to-slate-800 pb-24">
+      <header className="sticky top-0 z-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b px-4 py-3">
         <div className="flex items-center justify-between max-w-lg mx-auto">
           <Button
             variant="ghost"
@@ -232,7 +232,7 @@ export default function PuzzleGame() {
       </header>
 
       <main className="p-4 max-w-lg mx-auto">
-        <div className="flex items-center justify-between mb-4 bg-white rounded-xl p-3 shadow-sm">
+        <div className="flex items-center justify-between mb-4 bg-white dark:bg-slate-800 rounded-xl p-3 shadow-sm">
           <div className="flex items-center gap-2 text-sm">
             <Clock className="h-4 w-4 text-purple-500" />
             <span data-testid="text-time">{formatTime(time)}</span>
@@ -250,7 +250,7 @@ export default function PuzzleGame() {
         </div>
 
         <div 
-          className="relative aspect-square bg-white rounded-xl shadow-lg overflow-hidden mb-4"
+          className="relative aspect-square bg-white dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden mb-4"
           style={{ touchAction: "none" }}
         >
           {pieces.map((piece) => (
@@ -299,28 +299,28 @@ export default function PuzzleGame() {
               initial={{ scale: 0.5, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.5, opacity: 0 }}
-              className="bg-white rounded-2xl p-6 max-w-sm w-full text-center"
+              className="bg-white dark:bg-slate-800 rounded-2xl p-6 max-w-sm w-full text-center"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full flex items-center justify-center">
                 <CheckCircle className="h-10 w-10 text-white" />
               </div>
               <h2 className="text-2xl font-bold mb-2">{t("puzzle.congratulations")}</h2>
-              <p className="text-gray-600 mb-4">{t("puzzle.completedDesc")}</p>
+              <p className="text-muted-foreground mb-4">{t("puzzle.completedDesc")}</p>
               
               <div className="flex justify-center gap-6 mb-4">
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-purple-600">{formatTime(time)}</p>
-                  <p className="text-sm text-gray-500">{t("puzzle.time")}</p>
+                  <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">{formatTime(time)}</p>
+                  <p className="text-sm text-muted-foreground">{t("puzzle.time")}</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-pink-600">{moves}</p>
-                  <p className="text-sm text-gray-500">{t("puzzle.moves")}</p>
+                  <p className="text-2xl font-bold text-pink-600 dark:text-pink-400">{moves}</p>
+                  <p className="text-sm text-muted-foreground">{t("puzzle.moves")}</p>
                 </div>
               </div>
               
               {isNewRecord && (
-                <div className="bg-yellow-100 text-yellow-800 rounded-lg py-2 px-4 mb-4 flex items-center justify-center gap-2">
+                <div className="bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300 rounded-lg py-2 px-4 mb-4 flex items-center justify-center gap-2">
                   <Trophy className="h-5 w-5" />
                   <span className="font-medium">{t("puzzle.newRecord")}</span>
                 </div>

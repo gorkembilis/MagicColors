@@ -101,8 +101,8 @@ export default function PuzzlePack() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-cyan-50 pb-8">
-      <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-sm border-b">
+    <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-cyan-50 dark:from-slate-900 dark:to-slate-800 pb-8">
+      <header className="sticky top-0 z-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b">
         <div className="flex items-center gap-3 px-4 py-3 max-w-lg mx-auto">
           <Button
             variant="ghost"
@@ -118,7 +118,7 @@ export default function PuzzlePack() {
               <span className={`text-xs px-2 py-0.5 rounded-full ${difficultyColors[pack.difficulty]}`}>
                 {t(`difficulty.${pack.difficulty}`)}
               </span>
-              <span className="text-xs text-gray-500">{pack.count} {t("puzzle.puzzles")}</span>
+              <span className="text-xs text-muted-foreground">{pack.count} {t("puzzle.puzzles")}</span>
             </div>
           </div>
         </div>
@@ -160,7 +160,7 @@ export default function PuzzlePack() {
               className="relative"
             >
               <div
-                className={`aspect-square rounded-xl overflow-hidden bg-white shadow-sm cursor-pointer transition-transform hover:scale-[1.02] active:scale-95 ${
+                className={`aspect-square rounded-xl overflow-hidden bg-white dark:bg-slate-800 shadow-sm cursor-pointer transition-transform hover:scale-[1.02] active:scale-95 ${
                   isLocked ? "opacity-70" : ""
                 }`}
                 onClick={() => handleImageClick(image.url, image.title)}

@@ -152,8 +152,8 @@ export default function Puzzles() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-cyan-50 pb-24">
-      <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-sm border-b px-4 py-3">
+    <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-cyan-50 dark:from-slate-900 dark:to-slate-800 pb-24">
+      <header className="sticky top-0 z-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b px-4 py-3">
         <div className="flex items-center justify-between max-w-lg mx-auto">
           <Button
             variant="ghost"
@@ -193,7 +193,7 @@ export default function Puzzles() {
               {puzzlePacks.map((pack) => (
                 <motion.div key={pack.id} variants={item}>
                   <Card 
-                    className="group cursor-pointer overflow-hidden border-none shadow-sm transition-all hover:-translate-y-1 hover:shadow-md bg-white active:scale-95 duration-100"
+                    className="group cursor-pointer overflow-hidden border-none shadow-sm transition-all hover:-translate-y-1 hover:shadow-md bg-white dark:bg-slate-800 active:scale-95 duration-100"
                     onClick={() => navigate(`/puzzle-pack/${pack.id}`)}
                     data-testid={`puzzle-pack-${pack.id}`}
                   >
@@ -235,9 +235,9 @@ export default function Puzzles() {
           <TabsContent value="myPuzzles" className="mt-0">
             {!user ? (
               <div className="text-center py-12">
-                <Puzzle className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+                <Puzzle className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
                 <h2 className="text-xl font-bold mb-2">{t("profile.loginRequired")}</h2>
-                <p className="text-gray-500 mb-4">{t("profile.loginDesc")}</p>
+                <p className="text-muted-foreground mb-4">{t("profile.loginDesc")}</p>
                 <Button onClick={() => navigate("/auth")} data-testid="button-login">
                   {t("profile.login")}
                 </Button>
@@ -248,11 +248,11 @@ export default function Puzzles() {
               </div>
             ) : puzzles.length === 0 ? (
               <div className="text-center py-12">
-                <div className="w-24 h-24 mx-auto mb-4 bg-gradient-to-r from-indigo-100 to-cyan-100 rounded-full flex items-center justify-center">
-                  <Puzzle className="h-12 w-12 text-indigo-400" />
+                <div className="w-24 h-24 mx-auto mb-4 bg-gradient-to-r from-indigo-100 to-cyan-100 dark:from-indigo-900 dark:to-cyan-900 rounded-full flex items-center justify-center">
+                  <Puzzle className="h-12 w-12 text-indigo-400 dark:text-indigo-300" />
                 </div>
                 <h2 className="text-lg font-semibold mb-2">{t("puzzle.empty")}</h2>
-                <p className="text-gray-500 text-sm mb-4">{t("puzzle.emptyDesc")}</p>
+                <p className="text-muted-foreground text-sm mb-4">{t("puzzle.emptyDesc")}</p>
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-4">
@@ -261,7 +261,7 @@ export default function Puzzles() {
                     key={puzzle.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-white rounded-xl shadow-sm overflow-hidden"
+                    className="bg-white dark:bg-slate-800 rounded-xl shadow-sm overflow-hidden"
                   >
                     <div className="relative aspect-square">
                       <img
@@ -314,18 +314,18 @@ export default function Puzzles() {
           </TabsContent>
 
           <TabsContent value="ai" className="mt-0">
-            <div className="bg-white rounded-2xl p-6 shadow-sm">
+            <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm">
               <div className="text-center mb-6">
                 <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-indigo-500 to-cyan-500 rounded-full flex items-center justify-center">
                   <Wand2 className="h-8 w-8 text-white" />
                 </div>
                 <h2 className="text-lg font-bold mb-2">{t("puzzle.aiGenerate")}</h2>
-                <p className="text-sm text-gray-500">{t("puzzle.aiGenerateDesc")}</p>
+                <p className="text-sm text-muted-foreground">{t("puzzle.aiGenerateDesc")}</p>
               </div>
 
               {!user ? (
                 <div className="text-center">
-                  <p className="text-gray-500 mb-4">{t("profile.loginDesc")}</p>
+                  <p className="text-muted-foreground mb-4">{t("profile.loginDesc")}</p>
                   <Button onClick={() => navigate("/auth")} data-testid="button-login-ai">
                     {t("profile.login")}
                   </Button>
