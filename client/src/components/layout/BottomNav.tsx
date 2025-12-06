@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, Wand2, Crown, Image as ImageIcon, User } from "lucide-react";
+import { Home, Wand2, Image as ImageIcon, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n";
 
@@ -50,17 +50,6 @@ export function BottomNav() {
         >
           <ImageIcon className={cn("h-6 w-6", isActive("/gallery") && "fill-current")} />
           <span className="text-[10px] font-bold">{t('nav.gallery')}</span>
-        </Link>
-
-        <Link
-          href="/premium"
-          className={cn(
-            "flex flex-col items-center justify-center gap-1 p-2 transition-colors",
-            isActive("/premium") ? "text-secondary" : "text-muted-foreground hover:text-secondary/70"
-          )}
-        >
-          <Crown className={cn("h-6 w-6", isActive("/premium") && "fill-current")} />
-          <span className="text-[10px] font-bold">{t('nav.premium')}</span>
         </Link>
 
         <Link

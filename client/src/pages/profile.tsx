@@ -245,6 +245,80 @@ export default function Profile() {
           </div>
         </motion.div>
 
+        {/* Premium Section */}
+        <motion.div variants={item}>
+          <h3 className="text-lg font-bold flex items-center gap-2 mb-3">
+            <Crown className="w-5 h-5 text-secondary" />
+            Premium
+          </h3>
+          
+          {user.isPremium ? (
+            <Card className="overflow-hidden border-none shadow-lg">
+              <div className="bg-gradient-to-br from-yellow-400 via-orange-500 to-pink-500 p-6 text-white text-center">
+                <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm mx-auto mb-4 flex items-center justify-center">
+                  <Crown className="w-8 h-8 text-white" />
+                </div>
+                <h4 className="text-xl font-bold mb-1">
+                  {t("profile.premiumActive")}
+                </h4>
+                <p className="text-white/80 text-sm">
+                  {t("profile.premiumActiveDesc")}
+                </p>
+                <div className="mt-4 flex justify-center gap-2 flex-wrap">
+                  <div className="bg-white/20 rounded-full px-3 py-1 text-xs font-medium backdrop-blur-sm">
+                    {t("profile.premiumBenefit1")}
+                  </div>
+                  <div className="bg-white/20 rounded-full px-3 py-1 text-xs font-medium backdrop-blur-sm">
+                    {t("profile.premiumBenefit2")}
+                  </div>
+                  <div className="bg-white/20 rounded-full px-3 py-1 text-xs font-medium backdrop-blur-sm">
+                    {t("profile.premiumBenefit3")}
+                  </div>
+                </div>
+              </div>
+            </Card>
+          ) : (
+            <Card className="overflow-hidden border-secondary/30">
+              <div className="bg-gradient-to-r from-secondary/10 to-orange-400/10 p-4">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-full bg-secondary/20 flex items-center justify-center">
+                    <Crown className="w-6 h-6 text-secondary" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold">{t("profile.upgradeToPremium")}</h4>
+                    <p className="text-xs text-muted-foreground">{t("profile.upgradeDesc")}</p>
+                  </div>
+                </div>
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center gap-2 text-sm">
+                    <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
+                      <span className="text-white text-xs">✓</span>
+                    </div>
+                    <span>{t("profile.premiumFeature1")}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
+                      <span className="text-white text-xs">✓</span>
+                    </div>
+                    <span>{t("profile.premiumFeature2")}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
+                      <span className="text-white text-xs">✓</span>
+                    </div>
+                    <span>{t("profile.premiumFeature3")}</span>
+                  </div>
+                </div>
+                <Link href="/premium">
+                  <Button className="w-full bg-gradient-to-r from-secondary to-orange-500 hover:from-secondary/90 hover:to-orange-500/90 text-white font-bold">
+                    {t("profile.getPremium")}
+                  </Button>
+                </Link>
+              </div>
+            </Card>
+          )}
+        </motion.div>
+
         <motion.div variants={item} className="space-y-2">
           <Link href="/settings">
             <Card className="cursor-pointer hover:bg-muted/50 transition-colors">
@@ -255,18 +329,6 @@ export default function Profile() {
               </CardContent>
             </Card>
           </Link>
-
-          {!user.isPremium && (
-            <Link href="/premium">
-              <Card className="cursor-pointer bg-gradient-to-r from-secondary/20 to-primary/20 border-secondary/50 hover:border-secondary transition-colors">
-                <CardContent className="py-3 flex items-center gap-3">
-                  <Crown className="w-5 h-5 text-secondary" />
-                  <span className="flex-1 font-medium">{t("nav.premium")}</span>
-                  <ChevronRight className="w-5 h-5 text-secondary" />
-                </CardContent>
-              </Card>
-            </Link>
-          )}
 
           <Button 
             variant="ghost" 
