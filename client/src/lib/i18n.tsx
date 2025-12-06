@@ -14,6 +14,7 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.home": "Home",
     "nav.create": "Create",
     "nav.gallery": "My Content",
+    "nav.coloring": "Coloring",
     "nav.premium": "Premium",
     
     "onboarding.slide1.title": "AI Magic",
@@ -257,6 +258,7 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.home": "Ana Sayfa",
     "nav.create": "Oluştur",
     "nav.gallery": "İçeriklerim",
+    "nav.coloring": "Boyama",
     "nav.premium": "Premium",
     
     "onboarding.slide1.title": "AI Sihiri",
