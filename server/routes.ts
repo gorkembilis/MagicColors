@@ -352,5 +352,113 @@ export async function registerRoutes(
     }
   });
 
+  // Promo Code Routes - Admin
+  app.get("/api/admin/promo-codes", isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const promoCodes = await storage.getAllPromoCodes();
+      res.json(promoCodes);
+    } catch (error) {
+      console.error("Error fetching promo codes:", error);
+      res.status(500).json({ message: "Promosyon kodları alınamadı" });
+    }
+  });
+
+  app.post("/api/admin/promo-codes", isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const { code, description, maxUses, premiumDays, expiresAt, isActive } = req.body;
+
+      if (!code) {
+        return res.status(400).json({ message: "Kod gerekli" });
+      }
+
+      const promoCode = await storage.createPromoCode({
+        code,
+        description,
+        maxUses: maxUses || 1,
+        premiumDays: premiumDays || 30,
+        expiresAt: expiresAt ? new Date(expiresAt) : null,
+        isActive: isActive !== false,
+      });
+
+      res.json(promoCode);
+    } catch (error: any) {
+      console.error("Error creating promo code:", error);
+      if (error.code === "23505") {
+        return res.status(400).json({ message: "Bu kod zaten mevcut" });
+      }
+      res.status(500).json({ message: "Promosyon kodu oluşturulamadı" });
+    }
+  });
+
+  app.patch("/api/admin/promo-codes/:id", isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { code, description, maxUses, remainingUses, premiumDays, expiresAt, isActive } = req.body;
+
+      const updates: any = {};
+      if (code !== undefined) updates.code = code.toUpperCase();
+      if (description !== undefined) updates.description = description;
+      if (maxUses !== undefined) updates.maxUses = maxUses;
+      if (remainingUses !== undefined) updates.remainingUses = remainingUses;
+      if (premiumDays !== undefined) updates.premiumDays = premiumDays;
+      if (expiresAt !== undefined) updates.expiresAt = expiresAt ? new Date(expiresAt) : null;
+      if (isActive !== undefined) updates.isActive = isActive;
+
+      const promoCode = await storage.updatePromoCode(parseInt(id), updates);
+      if (!promoCode) {
+        return res.status(404).json({ message: "Promosyon kodu bulunamadı" });
+      }
+
+      res.json(promoCode);
+    } catch (error) {
+      console.error("Error updating promo code:", error);
+      res.status(500).json({ message: "Promosyon kodu güncellenemedi" });
+    }
+  });
+
+  app.delete("/api/admin/promo-codes/:id", isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deletePromoCode(parseInt(id));
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting promo code:", error);
+      res.status(500).json({ message: "Promosyon kodu silinemedi" });
+    }
+  });
+
+  app.get("/api/admin/promo-codes/:id/redemptions", isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const redemptions = await storage.getPromoCodeRedemptions(parseInt(id));
+      res.json(redemptions);
+    } catch (error) {
+      console.error("Error fetching redemptions:", error);
+      res.status(500).json({ message: "Kullanım geçmişi alınamadı" });
+    }
+  });
+
+  // Promo Code Routes - User
+  app.post("/api/promo/redeem", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      const { code } = req.body;
+
+      if (!code) {
+        return res.status(400).json({ success: false, message: "Kod gerekli" });
+      }
+
+      const result = await storage.redeemPromoCode(userId, code);
+      if (!result.success) {
+        return res.status(400).json(result);
+      }
+
+      res.json(result);
+    } catch (error) {
+      console.error("Error redeeming promo code:", error);
+      res.status(500).json({ success: false, message: "Kod kullanılamadı" });
+    }
+  });
+
   return httpServer;
 }
