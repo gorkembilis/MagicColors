@@ -25,6 +25,11 @@ Preferred communication style: Simple, everyday language.
   - **Social Sharing**: Native share API integration for sharing colored images
   - **Settings Page**: Notification preferences and language settings (`/settings`)
 - **Admin Dashboard** (December 2024): Added comprehensive admin panel at `/admin` for managing users, viewing statistics, and managing generated images
+- **Promo Code System** (December 2024):
+  - Admin panel "Codes" tab for creating/managing promo codes with max uses, expiry dates, and premium days
+  - User promo code redemption on premium page with atomic transaction-based validation
+  - Database tables: `promo_codes` and `promo_code_redemptions` with unique constraint on (userId, promoCodeId)
+  - Automatic premium status update on successful code redemption
 - **In-App Authentication** (December 2024): Replaced Replit Auth with custom email/password authentication system to avoid external redirects
 
 ## Pending Integrations
