@@ -24,7 +24,7 @@ Preferred communication style: Simple, everyday language.
   - **New Packs**: Added Sea Creatures, Birds, Sports, and Music coloring packs
   - **Social Sharing**: Native share API integration for sharing colored images
   - **Settings Page**: Notification preferences and language settings (`/settings`)
-- **Admin Dashboard** (December 2024): Added comprehensive admin panel at `/admin` for managing users, viewing statistics, and managing generated images
+- **Admin Dashboard** (December 2024): Added comprehensive admin panel for managing users, viewing statistics, and managing generated images
 - **Promo Code System** (December 2024):
   - Admin panel "Codes" tab for creating/managing promo codes with max uses, expiry dates, and premium days
   - User promo code redemption on premium page with atomic transaction-based validation
@@ -82,7 +82,7 @@ Preferred communication style: Simple, everyday language.
 - `/gallery` - User's saved AI-generated images
 - `/settings` - Notification preferences and language settings
 - `/premium` - Premium tier upsell page
-- `/admin` - Admin dashboard (requires admin role)
+- `/mc-management-2024` - Admin dashboard (secret URL, requires admin role, not linked from main app)
 
 ### Backend Architecture
 
