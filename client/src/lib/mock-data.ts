@@ -5,6 +5,26 @@ import dinosCover from "@assets/generated_images/colorful_dinosaurs_cover.png";
 import princessCover from "@assets/generated_images/colorful_princess_cover.png";
 import spaceCover from "@assets/generated_images/colorful_space_cover.png";
 
+// New Pack Covers
+import flowersCover from "@assets/generated_images/flowers_coloring_cover.png";
+import vegetablesCover from "@assets/generated_images/vegetables_coloring_cover.png";
+import insectsCover from "@assets/generated_images/insects_coloring_cover.png";
+import farmCover from "@assets/generated_images/farm_coloring_cover.png";
+import shapesCover from "@assets/generated_images/shapes_coloring_cover.png";
+import weatherCover from "@assets/generated_images/weather_coloring_cover.png";
+import jungleCover from "@assets/generated_images/jungle_coloring_cover.png";
+import robotsCover from "@assets/generated_images/robots_coloring_cover.png";
+import knightsCover from "@assets/generated_images/knights_coloring_cover.png";
+import piratesCover from "@assets/generated_images/pirates_coloring_cover.png";
+import dragonsCover from "@assets/generated_images/dragons_coloring_cover.png";
+import constructionCover from "@assets/generated_images/construction_cover.png";
+import circusCover from "@assets/generated_images/circus_coloring_cover.png";
+import mermaidsCover from "@assets/generated_images/mermaids_coloring_cover.png";
+import dessertsCover from "@assets/generated_images/desserts_coloring_cover.png";
+import campingCover from "@assets/generated_images/camping_coloring_cover.png";
+import monstersCover from "@assets/generated_images/monsters_coloring_cover.png";
+import ninjasCover from "@assets/generated_images/ninjas_coloring_cover.png";
+
 // Animals
 import lionImg from "@assets/generated_images/lion_coloring_page.png";
 import elephantImg from "@assets/generated_images/elephant_coloring_page.png";
@@ -172,6 +192,38 @@ import rockCreatureImg from "@assets/generated_images/rock_creature_coloring.png
 import ghostCreatureImg from "@assets/generated_images/ghost_creature_coloring.png";
 import psychicCreatureImg from "@assets/generated_images/psychic_creature_coloring.png";
 import iceCreatureImg from "@assets/generated_images/ice_creature_coloring.png";
+
+// New Pack Images
+import roseImg from "@assets/generated_images/rose_coloring_page.png";
+import sunflowerImg from "@assets/generated_images/sunflower_coloring_page.png";
+import tulipImg from "@assets/generated_images/tulip_coloring_page.png";
+import carrotImg from "@assets/generated_images/carrot_coloring_page.png";
+import tomatoImg from "@assets/generated_images/tomato_coloring_page.png";
+import broccoliImg from "@assets/generated_images/broccoli_coloring_page.png";
+import butterflyImg from "@assets/generated_images/butterfly_coloring_page.png";
+import ladybugImg from "@assets/generated_images/ladybug_coloring_page.png";
+import beeImg from "@assets/generated_images/bee_coloring_page.png";
+import cowImg from "@assets/generated_images/cow_coloring_page.png";
+import pigImg from "@assets/generated_images/pig_coloring_page.png";
+import chickenImg from "@assets/generated_images/chicken_coloring_page.png";
+import shapesPageImg from "@assets/generated_images/shapes_coloring_page.png";
+import sunImg from "@assets/generated_images/sun_coloring_page.png";
+import rainbowImg from "@assets/generated_images/rainbow_coloring_page.png";
+import jungleLionImg from "@assets/generated_images/jungle_lion_page.png";
+import robotImg from "@assets/generated_images/robot_coloring_page.png";
+import knightImg from "@assets/generated_images/knight_coloring_page.png";
+import pirateImg from "@assets/generated_images/pirate_coloring_page.png";
+import dragonImg from "@assets/generated_images/dragon_coloring_page.png";
+import clownImg from "@assets/generated_images/clown_coloring_page.png";
+import circusElephantImg from "@assets/generated_images/circus_elephant_page.png";
+import mermaidImg from "@assets/generated_images/mermaid_coloring_page.png";
+import cupcakeImg from "@assets/generated_images/cupcake_coloring_page.png";
+import iceCreamPageImg from "@assets/generated_images/ice_cream_coloring_page.png";
+import tentImg from "@assets/generated_images/tent_coloring_page.png";
+import monsterImg from "@assets/generated_images/monster_coloring_page.png";
+import ninjaImg from "@assets/generated_images/ninja_coloring_page.png";
+import bulldozerImg from "@assets/generated_images/bulldozer_coloring_page.png";
+import craneImg from "@assets/generated_images/crane_coloring_page.png";
 
 export interface PackImage {
   id: string;
@@ -378,6 +430,261 @@ export const packs: Pack[] = [
       saxophoneImg, fluteImg, harpImg, maracasImg, xylophoneImg,
       guitarImg, pianoImg, drumsImg, violinImg, trumpetImg,
       saxophoneImg, fluteImg, harpImg, maracasImg, xylophoneImg
+    ], 20)
+  },
+  // NEW EASY PACKS
+  {
+    id: "flowers",
+    title: "Flowers",
+    cover: flowersCover,
+    isPremium: false,
+    count: 20,
+    difficulty: "easy",
+    images: createImages("flowers", "Flowers", [
+      roseImg, sunflowerImg, tulipImg, roseImg, sunflowerImg,
+      tulipImg, roseImg, sunflowerImg, tulipImg, roseImg,
+      sunflowerImg, tulipImg, roseImg, sunflowerImg, tulipImg,
+      roseImg, sunflowerImg, tulipImg, roseImg, sunflowerImg
+    ], 20)
+  },
+  {
+    id: "vegetables",
+    title: "Vegetables",
+    cover: vegetablesCover,
+    isPremium: false,
+    count: 20,
+    difficulty: "easy",
+    images: createImages("vegetables", "Vegetables", [
+      carrotImg, tomatoImg, broccoliImg, carrotImg, tomatoImg,
+      broccoliImg, carrotImg, tomatoImg, broccoliImg, carrotImg,
+      tomatoImg, broccoliImg, carrotImg, tomatoImg, broccoliImg,
+      carrotImg, tomatoImg, broccoliImg, carrotImg, tomatoImg
+    ], 20)
+  },
+  {
+    id: "insects",
+    title: "Insects",
+    cover: insectsCover,
+    isPremium: false,
+    count: 20,
+    difficulty: "easy",
+    images: createImages("insects", "Insects", [
+      butterflyImg, ladybugImg, beeImg, butterflyImg, ladybugImg,
+      beeImg, butterflyImg, ladybugImg, beeImg, butterflyImg,
+      ladybugImg, beeImg, butterflyImg, ladybugImg, beeImg,
+      butterflyImg, ladybugImg, beeImg, butterflyImg, ladybugImg
+    ], 20)
+  },
+  {
+    id: "farm",
+    title: "Farm Animals",
+    cover: farmCover,
+    isPremium: false,
+    count: 20,
+    difficulty: "easy",
+    images: createImages("farm", "Farm Animals", [
+      cowImg, pigImg, chickenImg, sheepImg, horseImg,
+      cowImg, pigImg, chickenImg, sheepImg, horseImg,
+      cowImg, pigImg, chickenImg, sheepImg, horseImg,
+      cowImg, pigImg, chickenImg, sheepImg, horseImg
+    ], 20)
+  },
+  {
+    id: "shapes",
+    title: "Shapes",
+    cover: shapesCover,
+    isPremium: false,
+    count: 20,
+    difficulty: "easy",
+    images: createImages("shapes", "Shapes", [
+      shapesPageImg, shapesPageImg, shapesPageImg, shapesPageImg, shapesPageImg,
+      shapesPageImg, shapesPageImg, shapesPageImg, shapesPageImg, shapesPageImg,
+      shapesPageImg, shapesPageImg, shapesPageImg, shapesPageImg, shapesPageImg,
+      shapesPageImg, shapesPageImg, shapesPageImg, shapesPageImg, shapesPageImg
+    ], 20)
+  },
+  {
+    id: "weather",
+    title: "Weather",
+    cover: weatherCover,
+    isPremium: false,
+    count: 20,
+    difficulty: "easy",
+    images: createImages("weather", "Weather", [
+      sunImg, rainbowImg, sunImg, rainbowImg, sunImg,
+      rainbowImg, sunImg, rainbowImg, sunImg, rainbowImg,
+      sunImg, rainbowImg, sunImg, rainbowImg, sunImg,
+      rainbowImg, sunImg, rainbowImg, sunImg, rainbowImg
+    ], 20)
+  },
+  // NEW MEDIUM PACKS
+  {
+    id: "jungle",
+    title: "Jungle Safari",
+    cover: jungleCover,
+    isPremium: false,
+    count: 20,
+    difficulty: "medium",
+    images: createImages("jungle", "Jungle Safari", [
+      jungleLionImg, lionImg, tigerImg, monkeyImg, elephantImg,
+      jungleLionImg, lionImg, tigerImg, monkeyImg, elephantImg,
+      jungleLionImg, lionImg, tigerImg, monkeyImg, elephantImg,
+      jungleLionImg, lionImg, tigerImg, monkeyImg, elephantImg
+    ], 20)
+  },
+  {
+    id: "robots",
+    title: "Robots",
+    cover: robotsCover,
+    isPremium: true,
+    count: 20,
+    difficulty: "medium",
+    images: createImages("robots", "Robots", [
+      robotImg, robotImg, robotImg, robotImg, robotImg,
+      robotImg, robotImg, robotImg, robotImg, robotImg,
+      robotImg, robotImg, robotImg, robotImg, robotImg,
+      robotImg, robotImg, robotImg, robotImg, robotImg
+    ], 20)
+  },
+  {
+    id: "construction",
+    title: "Construction",
+    cover: constructionCover,
+    isPremium: false,
+    count: 20,
+    difficulty: "medium",
+    images: createImages("construction", "Construction", [
+      bulldozerImg, craneImg, excavatorImg, bulldozerImg, craneImg,
+      excavatorImg, bulldozerImg, craneImg, excavatorImg, bulldozerImg,
+      craneImg, excavatorImg, bulldozerImg, craneImg, excavatorImg,
+      bulldozerImg, craneImg, excavatorImg, bulldozerImg, craneImg
+    ], 20)
+  },
+  {
+    id: "circus",
+    title: "Circus",
+    cover: circusCover,
+    isPremium: true,
+    count: 20,
+    difficulty: "medium",
+    images: createImages("circus", "Circus", [
+      clownImg, circusElephantImg, clownImg, circusElephantImg, clownImg,
+      circusElephantImg, clownImg, circusElephantImg, clownImg, circusElephantImg,
+      clownImg, circusElephantImg, clownImg, circusElephantImg, clownImg,
+      circusElephantImg, clownImg, circusElephantImg, clownImg, circusElephantImg
+    ], 20)
+  },
+  {
+    id: "desserts",
+    title: "Desserts",
+    cover: dessertsCover,
+    isPremium: false,
+    count: 20,
+    difficulty: "medium",
+    images: createImages("desserts", "Desserts", [
+      cupcakeImg, iceCreamPageImg, cupcakeImg, iceCreamPageImg, cupcakeImg,
+      iceCreamPageImg, cupcakeImg, iceCreamPageImg, cupcakeImg, iceCreamPageImg,
+      cupcakeImg, iceCreamPageImg, cupcakeImg, iceCreamPageImg, cupcakeImg,
+      iceCreamPageImg, cupcakeImg, iceCreamPageImg, cupcakeImg, iceCreamPageImg
+    ], 20)
+  },
+  // NEW HARD PACKS
+  {
+    id: "knights",
+    title: "Knights",
+    cover: knightsCover,
+    isPremium: true,
+    count: 20,
+    difficulty: "hard",
+    images: createImages("knights", "Knights", [
+      knightImg, castleImg, knightImg, castleImg, knightImg,
+      castleImg, knightImg, castleImg, knightImg, castleImg,
+      knightImg, castleImg, knightImg, castleImg, knightImg,
+      castleImg, knightImg, castleImg, knightImg, castleImg
+    ], 20)
+  },
+  {
+    id: "pirates",
+    title: "Pirates",
+    cover: piratesCover,
+    isPremium: true,
+    count: 20,
+    difficulty: "hard",
+    images: createImages("pirates", "Pirates", [
+      pirateImg, sailboatImg, pirateImg, sailboatImg, pirateImg,
+      sailboatImg, pirateImg, sailboatImg, pirateImg, sailboatImg,
+      pirateImg, sailboatImg, pirateImg, sailboatImg, pirateImg,
+      sailboatImg, pirateImg, sailboatImg, pirateImg, sailboatImg
+    ], 20)
+  },
+  {
+    id: "dragons",
+    title: "Dragons",
+    cover: dragonsCover,
+    isPremium: true,
+    count: 20,
+    difficulty: "hard",
+    images: createImages("dragons", "Dragons", [
+      dragonImg, dragonCreatureImg, dragonImg, dragonCreatureImg, dragonImg,
+      dragonCreatureImg, dragonImg, dragonCreatureImg, dragonImg, dragonCreatureImg,
+      dragonImg, dragonCreatureImg, dragonImg, dragonCreatureImg, dragonImg,
+      dragonCreatureImg, dragonImg, dragonCreatureImg, dragonImg, dragonCreatureImg
+    ], 20)
+  },
+  {
+    id: "mermaids",
+    title: "Mermaids",
+    cover: mermaidsCover,
+    isPremium: true,
+    count: 20,
+    difficulty: "hard",
+    images: createImages("mermaids", "Mermaids", [
+      mermaidImg, seahorseImg, dolphinImg, mermaidImg, seahorseImg,
+      dolphinImg, mermaidImg, seahorseImg, dolphinImg, mermaidImg,
+      seahorseImg, dolphinImg, mermaidImg, seahorseImg, dolphinImg,
+      mermaidImg, seahorseImg, dolphinImg, mermaidImg, seahorseImg
+    ], 20)
+  },
+  {
+    id: "camping",
+    title: "Camping",
+    cover: campingCover,
+    isPremium: false,
+    count: 20,
+    difficulty: "hard",
+    images: createImages("camping", "Camping", [
+      tentImg, sunImg, tentImg, sunImg, tentImg,
+      sunImg, tentImg, sunImg, tentImg, sunImg,
+      tentImg, sunImg, tentImg, sunImg, tentImg,
+      sunImg, tentImg, sunImg, tentImg, sunImg
+    ], 20)
+  },
+  {
+    id: "monsters",
+    title: "Monsters",
+    cover: monstersCover,
+    isPremium: true,
+    count: 20,
+    difficulty: "hard",
+    images: createImages("monsters", "Monsters", [
+      monsterImg, ghostCreatureImg, monsterImg, ghostCreatureImg, monsterImg,
+      ghostCreatureImg, monsterImg, ghostCreatureImg, monsterImg, ghostCreatureImg,
+      monsterImg, ghostCreatureImg, monsterImg, ghostCreatureImg, monsterImg,
+      ghostCreatureImg, monsterImg, ghostCreatureImg, monsterImg, ghostCreatureImg
+    ], 20)
+  },
+  {
+    id: "ninjas",
+    title: "Ninjas",
+    cover: ninjasCover,
+    isPremium: true,
+    count: 20,
+    difficulty: "hard",
+    images: createImages("ninjas", "Ninjas", [
+      ninjaImg, ninjaImg, ninjaImg, ninjaImg, ninjaImg,
+      ninjaImg, ninjaImg, ninjaImg, ninjaImg, ninjaImg,
+      ninjaImg, ninjaImg, ninjaImg, ninjaImg, ninjaImg,
+      ninjaImg, ninjaImg, ninjaImg, ninjaImg, ninjaImg
     ], 20)
   }
 ];
