@@ -190,7 +190,7 @@ export default function Home() {
                       </div>
                     )}
                     {!pack.isPremium && (
-                      <div className="absolute right-2 top-2 rounded-full bg-secondary px-2 py-0.5 text-[10px] font-bold text-secondary-foreground shadow-sm">
+                      <div className="absolute right-2 top-2 rounded-full bg-green-500 px-3 py-1 text-xs font-bold text-white shadow-lg border-2 border-white animate-pulse">
                         {t('home.packs.free')}
                       </div>
                     )}
