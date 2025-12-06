@@ -139,6 +139,24 @@ export const insertPromoCodeRedemptionSchema = createInsertSchema(promoCodeRedem
   redeemedAt: true,
 });
 
+export const puzzles = pgTable("puzzles", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  title: varchar("title").notNull(),
+  imageUrl: text("image_url").notNull(),
+  difficulty: integer("difficulty").notNull().default(3),
+  isCompleted: boolean("is_completed").notNull().default(false),
+  bestTime: integer("best_time"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const insertPuzzleSchema = createInsertSchema(puzzles).omit({
+  id: true,
+  createdAt: true,
+  isCompleted: true,
+  bestTime: true,
+});
+
 export const registerSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
@@ -168,3 +186,5 @@ export type PromoCode = typeof promoCodes.$inferSelect;
 export type InsertPromoCode = z.infer<typeof insertPromoCodeSchema>;
 export type PromoCodeRedemption = typeof promoCodeRedemptions.$inferSelect;
 export type InsertPromoCodeRedemption = z.infer<typeof insertPromoCodeRedemptionSchema>;
+export type Puzzle = typeof puzzles.$inferSelect;
+export type InsertPuzzle = z.infer<typeof insertPuzzleSchema>;

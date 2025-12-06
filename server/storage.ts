@@ -7,6 +7,7 @@ import {
   contestVotes,
   promoCodes,
   promoCodeRedemptions,
+  puzzles,
   type User,
   type UpsertUser,
   type GeneratedImage,
@@ -21,6 +22,8 @@ import {
   type PromoCode,
   type InsertPromoCode,
   type PromoCodeRedemption,
+  type Puzzle,
+  type InsertPuzzle,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, count, sql, and } from "drizzle-orm";
@@ -62,6 +65,12 @@ export interface IStorage {
   redeemPromoCode(userId: string, code: string): Promise<{ success: boolean; message: string; user?: User }>;
   getPromoCodeRedemptions(promoCodeId: number): Promise<(PromoCodeRedemption & { userEmail?: string | null })[]>;
   hasUserRedeemedCode(userId: string, promoCodeId: number): Promise<boolean>;
+  
+  getUserPuzzles(userId: string): Promise<Puzzle[]>;
+  getPuzzle(id: number): Promise<Puzzle | undefined>;
+  createPuzzle(puzzle: InsertPuzzle): Promise<Puzzle>;
+  updatePuzzle(id: number, data: Partial<Puzzle>): Promise<Puzzle | undefined>;
+  deletePuzzle(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -394,6 +403,38 @@ export class DatabaseStorage implements IStorage {
         eq(promoCodeRedemptions.promoCodeId, promoCodeId)
       ));
     return !!redemption;
+  }
+
+  async getUserPuzzles(userId: string): Promise<Puzzle[]> {
+    return await db
+      .select()
+      .from(puzzles)
+      .where(eq(puzzles.userId, userId))
+      .orderBy(desc(puzzles.createdAt));
+  }
+
+  async getPuzzle(id: number): Promise<Puzzle | undefined> {
+    const [puzzle] = await db.select().from(puzzles).where(eq(puzzles.id, id));
+    return puzzle;
+  }
+
+  async createPuzzle(puzzleData: InsertPuzzle): Promise<Puzzle> {
+    const [puzzle] = await db.insert(puzzles).values(puzzleData).returning();
+    return puzzle;
+  }
+
+  async updatePuzzle(id: number, data: Partial<Puzzle>): Promise<Puzzle | undefined> {
+    const [puzzle] = await db
+      .update(puzzles)
+      .set(data)
+      .where(eq(puzzles.id, id))
+      .returning();
+    return puzzle;
+  }
+
+  async deletePuzzle(id: number): Promise<boolean> {
+    await db.delete(puzzles).where(eq(puzzles.id, id));
+    return true;
   }
 }
 
