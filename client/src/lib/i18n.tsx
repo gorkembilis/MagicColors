@@ -13,7 +13,7 @@ const translations: Record<Language, Record<string, string>> = {
     "app.title": "MagicColors",
     "nav.home": "Home",
     "nav.create": "Create",
-    "nav.gallery": "My Art",
+    "nav.gallery": "My Content",
     "nav.premium": "Premium",
     
     "onboarding.slide1.title": "AI Magic",
@@ -72,7 +72,7 @@ const translations: Record<Language, Record<string, string>> = {
     "view.ad.label": "ADVERTISEMENT",
     "view.ad.remove": "Remove Ads with Premium",
 
-    "gallery.title": "My Gallery",
+    "gallery.title": "My Content",
     "gallery.empty.title": "No Artworks Yet",
     "gallery.empty.desc": "Create your first magic coloring page to see it here!",
     "gallery.createNow": "Create Now",
@@ -229,7 +229,7 @@ const translations: Record<Language, Record<string, string>> = {
     "app.title": "SihirliRenkler",
     "nav.home": "Ana Sayfa",
     "nav.create": "Oluştur",
-    "nav.gallery": "Resimlerim",
+    "nav.gallery": "İçeriklerim",
     "nav.premium": "Premium",
     
     "onboarding.slide1.title": "AI Sihiri",
@@ -288,7 +288,7 @@ const translations: Record<Language, Record<string, string>> = {
     "view.ad.label": "REKLAM",
     "view.ad.remove": "Premium ile Reklamları Kaldır",
 
-    "gallery.title": "Galerim",
+    "gallery.title": "İçeriklerim",
     "gallery.empty.title": "Henüz Resim Yok",
     "gallery.empty.desc": "İlk sihirli boyama sayfanı oluştur!",
     "gallery.createNow": "Hemen Oluştur",
