@@ -3,7 +3,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 const config: CapacitorConfig = {
   appId: 'com.magiccolors.app',
   appName: 'MagicColors',
-  webDir: 'www',
+  webDir: 'dist/public',
   server: {
     androidScheme: 'https',
     iosScheme: 'https',
@@ -20,15 +20,18 @@ const config: CapacitorConfig = {
       splashImmersive: true,
     },
     StatusBar: {
-      style: 'light',
+      style: 'LIGHT',
       backgroundColor: '#FF1493',
     },
   },
   ios: {
     contentInset: 'automatic',
+    backgroundColor: '#FF1493',
+    preferredContentMode: 'mobile',
   },
   android: {
-    allowMixedContent: true,
+    allowMixedContent: false,
+    backgroundColor: '#FF1493',
   },
 };
 

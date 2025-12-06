@@ -2,6 +2,21 @@
 
 Bu kılavuz, MagicColors web uygulamasını iOS ve Android mağazalarına yüklemek için gereken adımları açıklar.
 
+## Otomatik Build (GitHub Actions)
+
+Projeyi GitHub'a push ettiğinizde otomatik olarak APK oluşturulur:
+
+1. **Projeyi GitHub'a Push Edin**
+2. **Actions sekmesine gidin**
+3. **"Android APK Build" workflow'unu çalıştırın**
+4. **Artifacts bölümünden APK'yı indirin**
+
+### Workflow Dosyaları:
+- `.github/workflows/android-build.yml` - Android APK build
+- `.github/workflows/ios-build.yml` - iOS build (simulator)
+
+---
+
 ## Gereksinimler
 
 ### Tüm Platformlar için:
