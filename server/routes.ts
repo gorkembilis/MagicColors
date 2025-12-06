@@ -2,7 +2,7 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./auth";
-import { generateColoringPage } from "./gemini";
+import { generateColoringPage, generateColorfulPuzzleImage } from "./gemini";
 
 const isAdmin = async (req: any, res: Response, next: NextFunction) => {
   if (!req.session?.userId) {
@@ -547,6 +547,33 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error deleting puzzle:", error);
       res.status(500).json({ message: "Puzzle silinemedi" });
+    }
+  });
+
+  app.post("/api/generate-puzzle", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      const { prompt, difficulty } = req.body;
+
+      if (!prompt || typeof prompt !== "string") {
+        return res.status(400).json({ message: "Prompt is required" });
+      }
+
+      const validDifficulty = [3, 4, 5].includes(difficulty) ? difficulty : 3;
+
+      const imageUrl = await generateColorfulPuzzleImage(prompt);
+
+      const puzzle = await storage.createPuzzle({
+        userId,
+        title: prompt,
+        imageUrl,
+        difficulty: validDifficulty,
+      });
+
+      res.json(puzzle);
+    } catch (error) {
+      console.error("Error generating puzzle:", error);
+      res.status(500).json({ message: "Failed to generate puzzle" });
     }
   });
 

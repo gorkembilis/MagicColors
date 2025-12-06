@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { motion, AnimatePresence } from "framer-motion";
-import { Puzzle, Plus, Play, Trash2, Trophy, Clock, ArrowLeft, X, Check } from "lucide-react";
+import { motion } from "framer-motion";
+import { Puzzle, Plus, Play, Trash2, Trophy, ArrowLeft, X, Check, Wand2, Lock, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
-import { packs } from "@/lib/mock-data";
+import { puzzlePacks, PuzzleDifficulty } from "@/lib/puzzle-data";
 
 interface PuzzleData {
   id: number;
@@ -26,9 +28,12 @@ export default function Puzzles() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   
+  const [activeTab, setActiveTab] = useState<"packs" | "myPuzzles" | "ai">("packs");
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [selectedImage, setSelectedImage] = useState<{ url: string; title: string } | null>(null);
   const [selectedDifficulty, setSelectedDifficulty] = useState(3);
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const { data: puzzles = [], isLoading } = useQuery<PuzzleData[]>({
     queryKey: ["/api/puzzles"],
@@ -38,16 +43,6 @@ export default function Puzzles() {
       return res.json();
     },
     enabled: !!user,
-  });
-
-  const { data: myArt = [] } = useQuery({
-    queryKey: ["/api/my-art"],
-    queryFn: async () => {
-      const res = await fetch("/api/my-art", { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch art");
-      return res.json();
-    },
-    enabled: !!user && showCreateDialog,
   });
 
   const createPuzzleMutation = useMutation({
@@ -95,13 +90,20 @@ export default function Puzzles() {
     return t("puzzle.difficulty.hard");
   };
 
-  const allPackImages = packs.flatMap((pack) =>
-    pack.images.slice(0, 4).map((img) => ({
-      url: img.url,
-      title: img.title,
-      packId: pack.id,
-    }))
-  );
+  const difficultyColors: Record<PuzzleDifficulty, string> = {
+    easy: "bg-green-100 text-green-700 border-green-200",
+    medium: "bg-yellow-100 text-yellow-700 border-yellow-200",
+    hard: "bg-red-100 text-red-700 border-red-200"
+  };
+
+  const handleCreateFromPack = (imageUrl: string, title: string) => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+    setSelectedImage({ url: imageUrl, title });
+    setShowCreateDialog(true);
+  };
 
   const handleCreatePuzzle = () => {
     if (!selectedImage) return;
@@ -112,23 +114,45 @@ export default function Puzzles() {
     });
   };
 
-  if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="text-center">
-          <Puzzle className="h-16 w-16 mx-auto mb-4 text-gray-300" />
-          <h2 className="text-xl font-bold mb-2">{t("profile.loginRequired")}</h2>
-          <p className="text-gray-500 mb-4">{t("profile.loginDesc")}</p>
-          <Button onClick={() => navigate("/auth")} data-testid="button-login">
-            {t("profile.login")}
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  const handleAiGenerate = async () => {
+    if (!aiPrompt.trim() || !user) return;
+    
+    setIsGenerating(true);
+    try {
+      const res = await fetch("/api/generate-puzzle", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ prompt: aiPrompt, difficulty: selectedDifficulty }),
+      });
+      
+      if (!res.ok) throw new Error("Failed to generate puzzle");
+      
+      const puzzle = await res.json();
+      queryClient.invalidateQueries({ queryKey: ["/api/puzzles"] });
+      navigate(`/puzzle/${puzzle.id}`);
+    } catch (error) {
+      console.error("Error generating puzzle:", error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+  };
+
+  const item = {
+    hidden: { y: 20, opacity: 0 },
+    show: { y: 0, opacity: 1 }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-pink-50 pb-24">
+    <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-cyan-50 pb-24">
       <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-sm border-b px-4 py-3">
         <div className="flex items-center justify-between max-w-lg mx-auto">
           <Button
@@ -140,104 +164,243 @@ export default function Puzzles() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <h1 className="font-bold text-lg">{t("puzzle.title")}</h1>
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={() => setShowCreateDialog(true)}
-            className="text-pink-500"
-            data-testid="button-create-puzzle"
-          >
-            <Plus className="h-5 w-5" />
-          </Button>
+          <div className="w-10" />
         </div>
       </header>
 
-      <main className="p-4 max-w-lg mx-auto">
-        {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent" />
-          </div>
-        ) : puzzles.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="w-24 h-24 mx-auto mb-4 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full flex items-center justify-center">
-              <Puzzle className="h-12 w-12 text-purple-400" />
-            </div>
-            <h2 className="text-lg font-semibold mb-2">{t("puzzle.empty")}</h2>
-            <Button
-              onClick={() => setShowCreateDialog(true)}
-              className="mt-4 bg-gradient-to-r from-purple-500 to-pink-500"
-              data-testid="button-create-first-puzzle"
+      <div className="px-4 pt-4 max-w-lg mx-auto">
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
+          <TabsList className="grid w-full grid-cols-3 mb-4">
+            <TabsTrigger value="packs" data-testid="tab-packs">
+              {t("puzzle.packs")}
+            </TabsTrigger>
+            <TabsTrigger value="myPuzzles" data-testid="tab-my-puzzles">
+              {t("puzzle.myPuzzles")}
+            </TabsTrigger>
+            <TabsTrigger value="ai" data-testid="tab-ai">
+              <Wand2 className="h-4 w-4 mr-1" />
+              AI
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="packs" className="mt-0">
+            <motion.div 
+              variants={container}
+              initial="hidden"
+              animate="show"
+              className="grid grid-cols-2 gap-3"
             >
-              <Plus className="h-4 w-4 mr-2" />
-              {t("puzzle.createFromImage")}
-            </Button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 gap-4">
-            {puzzles.map((puzzle) => (
-              <motion.div
-                key={puzzle.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-white rounded-xl shadow-sm overflow-hidden"
-              >
-                <div className="relative aspect-square">
-                  <img
-                    src={puzzle.imageUrl}
-                    alt={puzzle.title}
-                    className="w-full h-full object-cover"
-                  />
-                  {puzzle.isCompleted && (
-                    <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                      <Check className="h-3 w-3" />
-                      {t("puzzle.completed")}
+              {puzzlePacks.map((pack) => (
+                <motion.div key={pack.id} variants={item}>
+                  <Card 
+                    className="group cursor-pointer overflow-hidden border-none shadow-sm transition-all hover:-translate-y-1 hover:shadow-md bg-white active:scale-95 duration-100"
+                    onClick={() => navigate(`/puzzle-pack/${pack.id}`)}
+                    data-testid={`puzzle-pack-${pack.id}`}
+                  >
+                    <div className="relative aspect-square overflow-hidden rounded-t-xl">
+                      <img 
+                        src={pack.cover} 
+                        alt={t(`puzzlePack.${pack.id}`)}
+                        className="h-full w-full object-cover"
+                      />
+                      {pack.isPremium && !user?.isPremium && (
+                        <div className="absolute right-2 top-2 rounded-full bg-black/60 p-1.5 text-yellow-400 backdrop-blur-sm">
+                          <Lock className="h-3 w-3" />
+                        </div>
+                      )}
+                      {pack.isPremium && user?.isPremium && (
+                        <div className="absolute right-2 top-2 rounded-full bg-gradient-to-r from-yellow-500 to-orange-500 px-2 py-0.5 text-[10px] font-bold text-white shadow-lg border border-white">
+                          Premium
+                        </div>
+                      )}
+                      {!pack.isPremium && (
+                        <div className="absolute right-2 top-2 rounded-full bg-green-500 px-2 py-0.5 text-[10px] font-bold text-white shadow-lg border border-white animate-pulse">
+                          {t('home.packs.free')}
+                        </div>
+                      )}
+                      <div className={`absolute left-2 top-2 rounded-full px-2 py-0.5 text-[10px] font-bold border ${difficultyColors[pack.difficulty]}`}>
+                        {t(`difficulty.${pack.difficulty}`)}
+                      </div>
                     </div>
-                  )}
-                  <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
-                    {getDifficultyLabel(puzzle.difficulty)}
-                  </div>
+                    <CardContent className="p-3">
+                      <h3 className="mb-0.5 text-sm font-bold leading-none truncate">{t(`puzzlePack.${pack.id}`)}</h3>
+                      <p className="text-[10px] text-muted-foreground">{pack.count} {t("puzzle.puzzles")}</p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </motion.div>
+          </TabsContent>
+
+          <TabsContent value="myPuzzles" className="mt-0">
+            {!user ? (
+              <div className="text-center py-12">
+                <Puzzle className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+                <h2 className="text-xl font-bold mb-2">{t("profile.loginRequired")}</h2>
+                <p className="text-gray-500 mb-4">{t("profile.loginDesc")}</p>
+                <Button onClick={() => navigate("/auth")} data-testid="button-login">
+                  {t("profile.login")}
+                </Button>
+              </div>
+            ) : isLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent" />
+              </div>
+            ) : puzzles.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="w-24 h-24 mx-auto mb-4 bg-gradient-to-r from-indigo-100 to-cyan-100 rounded-full flex items-center justify-center">
+                  <Puzzle className="h-12 w-12 text-indigo-400" />
                 </div>
-                <div className="p-3">
-                  <h3 className="font-medium text-sm truncate mb-2">{puzzle.title}</h3>
-                  {puzzle.bestTime && (
-                    <div className="flex items-center gap-1 text-xs text-yellow-600 mb-2">
-                      <Trophy className="h-3 w-3" />
-                      <span>{formatTime(puzzle.bestTime)}</span>
+                <h2 className="text-lg font-semibold mb-2">{t("puzzle.empty")}</h2>
+                <p className="text-gray-500 text-sm mb-4">{t("puzzle.emptyDesc")}</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-4">
+                {puzzles.map((puzzle) => (
+                  <motion.div
+                    key={puzzle.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-white rounded-xl shadow-sm overflow-hidden"
+                  >
+                    <div className="relative aspect-square">
+                      <img
+                        src={puzzle.imageUrl}
+                        alt={puzzle.title}
+                        className="w-full h-full object-cover"
+                      />
+                      {puzzle.isCompleted && (
+                        <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                          <Check className="h-3 w-3" />
+                          {t("puzzle.completed")}
+                        </div>
+                      )}
+                      <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
+                        {getDifficultyLabel(puzzle.difficulty)}
+                      </div>
                     </div>
-                  )}
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500"
-                      onClick={() => navigate(`/puzzle/${puzzle.id}`)}
-                      data-testid={`button-play-puzzle-${puzzle.id}`}
-                    >
-                      <Play className="h-3 w-3 mr-1" />
-                      {t("puzzle.play")}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => deletePuzzleMutation.mutate(puzzle.id)}
-                      data-testid={`button-delete-puzzle-${puzzle.id}`}
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
-                  </div>
+                    <div className="p-3">
+                      <h3 className="font-medium text-sm truncate mb-2">{puzzle.title}</h3>
+                      {puzzle.bestTime && (
+                        <div className="flex items-center gap-1 text-xs text-yellow-600 mb-2">
+                          <Trophy className="h-3 w-3" />
+                          <span>{formatTime(puzzle.bestTime)}</span>
+                        </div>
+                      )}
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          className="flex-1 bg-gradient-to-r from-indigo-500 to-cyan-500"
+                          onClick={() => navigate(`/puzzle/${puzzle.id}`)}
+                          data-testid={`button-play-puzzle-${puzzle.id}`}
+                        >
+                          <Play className="h-3 w-3 mr-1" />
+                          {t("puzzle.play")}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => deletePuzzleMutation.mutate(puzzle.id)}
+                          data-testid={`button-delete-puzzle-${puzzle.id}`}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="ai" className="mt-0">
+            <div className="bg-white rounded-2xl p-6 shadow-sm">
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-indigo-500 to-cyan-500 rounded-full flex items-center justify-center">
+                  <Wand2 className="h-8 w-8 text-white" />
                 </div>
-              </motion.div>
-            ))}
-          </div>
-        )}
-      </main>
+                <h2 className="text-lg font-bold mb-2">{t("puzzle.aiGenerate")}</h2>
+                <p className="text-sm text-gray-500">{t("puzzle.aiGenerateDesc")}</p>
+              </div>
+
+              {!user ? (
+                <div className="text-center">
+                  <p className="text-gray-500 mb-4">{t("profile.loginDesc")}</p>
+                  <Button onClick={() => navigate("/auth")} data-testid="button-login-ai">
+                    {t("profile.login")}
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium mb-2">{t("puzzle.aiPromptLabel")}</label>
+                    <Input
+                      value={aiPrompt}
+                      onChange={(e) => setAiPrompt(e.target.value)}
+                      placeholder={t("puzzle.aiPromptPlaceholder")}
+                      className="w-full"
+                      data-testid="input-ai-prompt"
+                    />
+                  </div>
+
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium mb-2">{t("puzzle.selectDifficulty")}</label>
+                    <div className="flex gap-2">
+                      {[3, 4, 5].map((diff) => (
+                        <Button
+                          key={diff}
+                          variant={selectedDifficulty === diff ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setSelectedDifficulty(diff)}
+                          className={selectedDifficulty === diff ? "bg-gradient-to-r from-indigo-500 to-cyan-500 flex-1" : "flex-1"}
+                          data-testid={`button-difficulty-${diff}`}
+                        >
+                          {getDifficultyLabel(diff)}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <Button
+                    className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500"
+                    onClick={handleAiGenerate}
+                    disabled={!aiPrompt.trim() || isGenerating}
+                    data-testid="button-generate-puzzle"
+                  >
+                    {isGenerating ? (
+                      <div className="flex items-center gap-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                        {t("puzzle.generating")}
+                      </div>
+                    ) : (
+                      <>
+                        <Wand2 className="h-4 w-4 mr-2" />
+                        {t("puzzle.generateButton")}
+                      </>
+                    )}
+                  </Button>
+                </>
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
 
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-        <DialogContent className="max-w-md max-h-[80vh] overflow-hidden flex flex-col">
+        <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>{t("puzzle.selectImage")}</DialogTitle>
+            <DialogTitle>{t("puzzle.selectDifficulty")}</DialogTitle>
           </DialogHeader>
           
-          <p className="text-sm text-gray-500 mb-4">{t("puzzle.selectImageDesc")}</p>
+          {selectedImage && (
+            <div className="aspect-square rounded-lg overflow-hidden mb-4">
+              <img
+                src={selectedImage.url}
+                alt={selectedImage.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
 
           <div className="flex gap-2 mb-4">
             {[3, 4, 5].map((diff) => (
@@ -246,88 +409,15 @@ export default function Puzzles() {
                 variant={selectedDifficulty === diff ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSelectedDifficulty(diff)}
-                className={selectedDifficulty === diff ? "bg-gradient-to-r from-purple-500 to-pink-500" : ""}
-                data-testid={`button-difficulty-${diff}`}
+                className={selectedDifficulty === diff ? "bg-gradient-to-r from-indigo-500 to-cyan-500 flex-1" : "flex-1"}
+                data-testid={`dialog-difficulty-${diff}`}
               >
                 {getDifficultyLabel(diff)}
               </Button>
             ))}
           </div>
 
-          <Tabs defaultValue="packs" className="flex-1 overflow-hidden flex flex-col">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="packs" data-testid="tab-from-packs">
-                {t("puzzle.fromPacks")}
-              </TabsTrigger>
-              <TabsTrigger value="myart" data-testid="tab-from-myart">
-                {t("puzzle.fromMyArt")}
-              </TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="packs" className="flex-1 overflow-y-auto mt-4">
-              <div className="grid grid-cols-3 gap-2">
-                {allPackImages.map((img, idx) => (
-                  <div
-                    key={`${img.packId}-${idx}`}
-                    className={`relative aspect-square rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${
-                      selectedImage?.url === img.url
-                        ? "border-pink-500 ring-2 ring-pink-300"
-                        : "border-transparent"
-                    }`}
-                    onClick={() => setSelectedImage(img)}
-                    data-testid={`image-select-${idx}`}
-                  >
-                    <img
-                      src={img.url}
-                      alt={img.title}
-                      className="w-full h-full object-cover"
-                    />
-                    {selectedImage?.url === img.url && (
-                      <div className="absolute inset-0 bg-pink-500/20 flex items-center justify-center">
-                        <Check className="h-6 w-6 text-pink-500" />
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="myart" className="flex-1 overflow-y-auto mt-4">
-              {myArt.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <p>{t("gallery.empty.desc")}</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-3 gap-2">
-                  {myArt.map((art: any) => (
-                    <div
-                      key={art.id}
-                      className={`relative aspect-square rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${
-                        selectedImage?.url === art.imageUrl
-                          ? "border-pink-500 ring-2 ring-pink-300"
-                          : "border-transparent"
-                      }`}
-                      onClick={() => setSelectedImage({ url: art.imageUrl, title: art.prompt })}
-                      data-testid={`myart-select-${art.id}`}
-                    >
-                      <img
-                        src={art.imageUrl}
-                        alt={art.prompt}
-                        className="w-full h-full object-cover"
-                      />
-                      {selectedImage?.url === art.imageUrl && (
-                        <div className="absolute inset-0 bg-pink-500/20 flex items-center justify-center">
-                          <Check className="h-6 w-6 text-pink-500" />
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </TabsContent>
-          </Tabs>
-
-          <div className="flex gap-3 mt-4 pt-4 border-t">
+          <div className="flex gap-3">
             <Button
               variant="outline"
               className="flex-1"
@@ -338,10 +428,10 @@ export default function Puzzles() {
               data-testid="button-cancel-create"
             >
               <X className="h-4 w-4 mr-2" />
-              İptal
+              {t("common.cancel")}
             </Button>
             <Button
-              className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500"
+              className="flex-1 bg-gradient-to-r from-indigo-500 to-cyan-500"
               onClick={handleCreatePuzzle}
               disabled={!selectedImage || createPuzzleMutation.isPending}
               data-testid="button-confirm-create"
@@ -350,8 +440,8 @@ export default function Puzzles() {
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
               ) : (
                 <>
-                  <Puzzle className="h-4 w-4 mr-2" />
-                  {t("puzzle.create")}
+                  <Play className="h-4 w-4 mr-2" />
+                  {t("puzzle.play")}
                 </>
               )}
             </Button>
