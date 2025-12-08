@@ -25,6 +25,18 @@ export async function registerRoutes(
 
   app.get("/api/auth/user", isAuthenticated, async (req: any, res) => {
     try {
+      if (req.guestMode) {
+        return res.json({
+          id: "guest",
+          email: "guest@magiccolors.app",
+          firstName: "Guest",
+          lastName: "User",
+          isPremium: true,
+          isAdmin: false,
+          profileImageUrl: null,
+          createdAt: new Date().toISOString(),
+        });
+      }
       const userId = req.session.userId;
       const user = await storage.getUser(userId);
       if (!user) {
@@ -48,7 +60,7 @@ export async function registerRoutes(
 
   app.post("/api/generate", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.session.userId;
+      const userId = req.guestMode ? null : req.session.userId;
       const { prompt } = req.body;
 
       if (!prompt || typeof prompt !== "string") {
@@ -57,13 +69,21 @@ export async function registerRoutes(
 
       const imageUrl = await generateColoringPage(prompt);
 
-      const image = await storage.createGeneratedImage({
-        userId,
-        prompt,
-        imageUrl,
-      });
-
-      res.json(image);
+      if (userId) {
+        const image = await storage.createGeneratedImage({
+          userId,
+          prompt,
+          imageUrl,
+        });
+        res.json(image);
+      } else {
+        res.json({
+          id: Date.now(),
+          prompt,
+          imageUrl,
+          createdAt: new Date().toISOString(),
+        });
+      }
     } catch (error) {
       console.error("Error generating image:", error);
       res.status(500).json({ message: "Failed to generate image" });
@@ -72,6 +92,9 @@ export async function registerRoutes(
 
   app.get("/api/my-art", isAuthenticated, async (req: any, res) => {
     try {
+      if (req.guestMode) {
+        return res.json([]);
+      }
       const userId = req.session.userId;
       const images = await storage.getUserGeneratedImages(userId);
       res.json(images);
@@ -83,6 +106,9 @@ export async function registerRoutes(
 
   app.get("/api/favorites", isAuthenticated, async (req: any, res) => {
     try {
+      if (req.guestMode) {
+        return res.json([]);
+      }
       const userId = req.session.userId;
       const favorites = await storage.getUserFavorites(userId);
       res.json(favorites);
@@ -94,6 +120,9 @@ export async function registerRoutes(
 
   app.post("/api/favorites", isAuthenticated, async (req: any, res) => {
     try {
+      if (req.guestMode) {
+        return res.json({ message: "Misafir modunda favoriler kaydedilemez", guestMode: true });
+      }
       const userId = req.session.userId;
       const { imageId, packId, imageUrl, title } = req.body;
 
