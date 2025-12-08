@@ -106,8 +106,8 @@ export default function Onboarding() {
         </AnimatePresence>
       </div>
 
-      <div className="px-6 pb-12">
-        <div className="flex justify-center gap-2 mb-8">
+      <div className="px-6 pb-32 pt-4">
+        <div className="flex justify-center gap-2 mb-6">
           {slides.map((_, index) => (
             <button
               key={index}

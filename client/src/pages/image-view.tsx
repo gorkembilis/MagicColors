@@ -116,151 +116,73 @@ export default function ImageView() {
     }
   };
 
-  const handlePrint = () => {
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-      printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>${title}</title>
-          <style>
-            @page {
-              size: A4 portrait;
-              margin: 1cm;
-            }
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            html, body {
-              width: 210mm;
-              height: 297mm;
-              background: white;
-            }
-            body {
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              padding: 1cm;
-            }
-            .page-container {
-              width: 100%;
-              height: 100%;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-            }
-            img {
-              max-width: 100%;
-              max-height: 100%;
-              object-fit: contain;
-            }
-            @media print {
-              html, body {
-                width: 210mm;
-                height: 297mm;
-              }
-              .page-container {
-                width: 190mm;
-                height: 277mm;
-              }
-            }
-          </style>
-        </head>
-        <body>
-          <div class="page-container">
-            <img src="${imageUrl}" alt="${title}" onload="window.print(); window.close();" />
-          </div>
-        </body>
-        </html>
-      `);
-      printWindow.document.close();
+  const handlePrint = async () => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const file = new File([blob], `${title.replace(/\s+/g, '-')}.png`, { type: "image/png" });
+      
+      if (navigator.share && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: title,
+          text: t("share.printText") || "Print this coloring page"
+        });
+      } else {
+        const printWindow = window.open('', '_blank');
+        if (printWindow) {
+          printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <title>${title}</title>
+              <style>
+                @page { size: A4 portrait; margin: 1cm; }
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                html, body { width: 210mm; height: 297mm; background: white; }
+                body { display: flex; justify-content: center; align-items: center; padding: 1cm; }
+                .page-container { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
+                img { max-width: 100%; max-height: 100%; object-fit: contain; }
+              </style>
+            </head>
+            <body>
+              <div class="page-container">
+                <img src="${imageUrl}" alt="${title}" onload="window.print(); window.close();" />
+              </div>
+            </body>
+            </html>
+          `);
+          printWindow.document.close();
+        }
+      }
+    } catch (error) {
+      console.error('Print failed:', error);
     }
   };
 
   const handleDownloadPdf = async () => {
     try {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const file = new File([blob], `${title.replace(/\s+/g, '-')}.png`, { type: "image/png" });
       
-      await new Promise((resolve, reject) => {
-        img.onload = resolve;
-        img.onerror = reject;
-        img.src = imageUrl;
-      });
-
-      const canvas = document.createElement('canvas');
-      canvas.width = img.width;
-      canvas.height = img.height;
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.fillStyle = 'white';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0);
-      }
-
-      const dataUrl = canvas.toDataURL('image/png');
-      
-      const printWindow = window.open('', '_blank');
-      if (printWindow) {
-        printWindow.document.write(`
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <title>${title}</title>
-            <style>
-              @page {
-                size: A4 portrait;
-                margin: 1cm;
-              }
-              * { margin: 0; padding: 0; box-sizing: border-box; }
-              html, body {
-                width: 210mm;
-                height: 297mm;
-                background: white;
-              }
-              body {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                padding: 1cm;
-              }
-              .page-container {
-                width: 100%;
-                height: 100%;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-              }
-              img {
-                max-width: 100%;
-                max-height: 100%;
-                object-fit: contain;
-              }
-              @media print {
-                html, body {
-                  width: 210mm;
-                  height: 297mm;
-                }
-                .page-container {
-                  width: 190mm;
-                  height: 277mm;
-                }
-              }
-            </style>
-          </head>
-          <body>
-            <div class="page-container">
-              <img src="${dataUrl}" alt="${title}" />
-            </div>
-            <script>
-              setTimeout(() => { window.print(); }, 100);
-            </script>
-          </body>
-          </html>
-        `);
-        printWindow.document.close();
+      if (navigator.share && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: title,
+          text: t("share.downloadText") || "Download this coloring page"
+        });
+      } else {
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `${title.replace(/\s+/g, '-')}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
       }
     } catch (error) {
-      console.error('PDF download failed:', error);
+      console.error('Download failed:', error);
       const link = document.createElement('a');
       link.href = imageUrl;
       link.download = `${title.replace(/\s+/g, '-')}.png`;
