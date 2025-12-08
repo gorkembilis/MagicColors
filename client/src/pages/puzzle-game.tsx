@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Shuffle, CheckCircle, Trophy, Clock, Move } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
+import { Confetti } from "@/components/Confetti";
+import { playSuccessSound } from "@/lib/sounds";
 
 interface PuzzlePiece {
   id: number;
@@ -134,6 +136,7 @@ export default function PuzzleGame() {
           bestTime: newRecord ? time : undefined,
         });
         
+        playSuccessSound();
         setTimeout(() => setShowCelebration(true), 300);
       }
     }
@@ -216,6 +219,7 @@ export default function PuzzleGame() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-pink-50 dark:from-slate-900 dark:to-slate-800 pb-24">
+      <Confetti isActive={showCelebration} />
       <header className="sticky top-0 z-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b px-4 py-3">
         <div className="flex items-center justify-between max-w-lg mx-auto">
           <Button
