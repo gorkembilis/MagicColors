@@ -6,7 +6,7 @@ import { ArrowLeft, Shuffle, CheckCircle, Trophy, Clock, Move } from "lucide-rea
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
 import { Confetti } from "@/components/Confetti";
-import { playSuccessSound } from "@/lib/sounds";
+import { useSound } from "@/lib/sounds";
 
 interface PuzzlePiece {
   id: number;
@@ -19,6 +19,7 @@ export default function PuzzleGame() {
   const [, navigate] = useLocation();
   const { t } = useI18n();
   const queryClient = useQueryClient();
+  const { playCelebration, playClick } = useSound();
   
   const [pieces, setPieces] = useState<PuzzlePiece[]>([]);
   const [selectedPiece, setSelectedPiece] = useState<number | null>(null);
@@ -136,7 +137,7 @@ export default function PuzzleGame() {
           bestTime: newRecord ? time : undefined,
         });
         
-        playSuccessSound();
+        playCelebration();
         setTimeout(() => setShowCelebration(true), 300);
       }
     }
