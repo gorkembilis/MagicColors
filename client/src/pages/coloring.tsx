@@ -248,9 +248,22 @@ export default function Coloring() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    const scaleFactor = 4;
+    const highResCanvas = document.createElement("canvas");
+    highResCanvas.width = canvas.width * scaleFactor;
+    highResCanvas.height = canvas.height * scaleFactor;
+    
+    const highResCtx = highResCanvas.getContext("2d");
+    if (!highResCtx) return;
+    
+    highResCtx.imageSmoothingEnabled = true;
+    highResCtx.imageSmoothingQuality = "high";
+    highResCtx.scale(scaleFactor, scaleFactor);
+    highResCtx.drawImage(canvas, 0, 0);
+
     const link = document.createElement("a");
     link.download = `magiccolors-${imageId}.png`;
-    link.href = canvas.toDataURL("image/png");
+    link.href = highResCanvas.toDataURL("image/png", 1.0);
     link.click();
   };
 

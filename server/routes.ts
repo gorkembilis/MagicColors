@@ -104,6 +104,29 @@ export async function registerRoutes(
     }
   });
 
+  app.delete("/api/my-art/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      if (req.guestMode) {
+        return res.status(401).json({ message: "Giriş yapmalısınız" });
+      }
+      const userId = req.session.userId;
+      const imageId = parseInt(req.params.id);
+      
+      const images = await storage.getUserGeneratedImages(userId);
+      const image = images.find(img => img.id === imageId);
+      
+      if (!image) {
+        return res.status(404).json({ message: "Görsel bulunamadı" });
+      }
+      
+      await storage.deleteGeneratedImage(imageId);
+      res.json({ success: true, message: "Görsel silindi" });
+    } catch (error) {
+      console.error("Error deleting image:", error);
+      res.status(500).json({ message: "Görsel silinemedi" });
+    }
+  });
+
   app.get("/api/favorites", isAuthenticated, async (req: any, res) => {
     try {
       if (req.guestMode) {

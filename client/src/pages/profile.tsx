@@ -9,8 +9,9 @@ import { Link, useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { 
   User, Settings, LogOut, Heart, Palette, Award, 
-  ChevronRight, Crown, Star, Trophy, ImageIcon, Wand2, Sparkles
+  ChevronRight, Crown, Star, Trophy, ImageIcon, Wand2, Sparkles, Trash2, X
 } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 interface Favorite {
   id: number;
@@ -35,6 +36,17 @@ export default function Profile() {
   const { data: myArt = [], isLoading: artLoading } = useQuery<any[]>({
     queryKey: ["/api/my-art"],
     enabled: !!user,
+  });
+
+  const deleteMagicImage = useMutation({
+    mutationFn: async (imageId: number) => {
+      const res = await fetch(`/api/my-art/${imageId}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Silme başarısız");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/my-art"] });
+    },
   });
 
   const handleLogout = async () => {
@@ -210,19 +222,48 @@ export default function Profile() {
           ) : (
             <div className="grid grid-cols-4 gap-2">
               {myArt.slice(0, 4).map((art: any) => (
-                <Link key={art.id} href={`/view/ai-${art.id}`}>
-                  <div className="aspect-square rounded-lg overflow-hidden bg-muted relative">
-                    <img 
-                      src={art.imageUrl} 
-                      alt={art.prompt || "AI Generated"} 
-                      className="w-full h-full object-cover"
-                      data-testid={`magic-image-${art.id}`}
-                    />
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-purple-600/80 to-transparent p-1">
-                      <Sparkles className="w-3 h-3 text-white" />
+                <div key={art.id} className="relative group">
+                  <Link href={`/view/ai-${art.id}`}>
+                    <div className="aspect-square rounded-lg overflow-hidden bg-muted relative">
+                      <img 
+                        src={art.imageUrl} 
+                        alt={art.prompt || "AI Generated"} 
+                        className="w-full h-full object-cover"
+                        data-testid={`magic-image-${art.id}`}
+                      />
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-purple-600/80 to-transparent p-1">
+                        <Sparkles className="w-3 h-3 text-white" />
+                      </div>
                     </div>
-                  </div>
-                </Link>
+                  </Link>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <button 
+                        className="absolute top-1 right-1 w-6 h-6 rounded-full bg-red-500/90 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
+                        data-testid={`delete-magic-${art.id}`}
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>{t("profile.deleteConfirmTitle") || "Görseli Sil"}</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          {t("profile.deleteConfirmDesc") || "Bu görseli silmek istediğinizden emin misiniz? Bu işlem geri alınamaz."}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>{t("common.cancel") || "İptal"}</AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={() => deleteMagicImage.mutate(art.id)}
+                          className="bg-red-500 hover:bg-red-600"
+                        >
+                          {t("profile.delete") || "Sil"}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
               ))}
             </div>
           )}

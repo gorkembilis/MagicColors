@@ -223,25 +223,32 @@ export default function Home() {
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
         >
-          <div className="bg-gradient-to-r from-purple-500 to-primary rounded-2xl p-4 text-white">
-            <div className="flex items-center gap-2 mb-3">
-              <Wand2 className="h-5 w-5" />
-              <span className="font-bold">{t('home.hero.magicTitle') || 'Sihir Yarat'}</span>
+          <div className="bg-gradient-to-br from-purple-600 via-primary to-pink-500 rounded-3xl p-5 text-white shadow-xl border-2 border-white/20">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                <Wand2 className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="font-bold text-lg">{t('home.hero.magicTitle') || 'Sihir Yarat'}</h3>
+                <p className="text-white/80 text-xs">{t('home.hero.subtitle') || 'AI ile boyama sayfası oluştur'}</p>
+              </div>
+              <Sparkles className="h-6 w-6 ml-auto text-yellow-300 animate-pulse" />
             </div>
             <div className="flex gap-2">
               <Input 
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 placeholder={t('home.hero.placeholder')}
-                className="h-11 rounded-xl border-none bg-white/90 text-gray-800 placeholder:text-gray-500 text-sm"
+                className="h-12 rounded-xl border-2 border-white/30 bg-white text-gray-800 placeholder:text-gray-400 text-sm font-medium shadow-inner"
                 data-testid="input-magic-prompt"
               />
               <Button 
                 type="submit" 
                 size="lg" 
-                className="h-11 px-5 rounded-xl bg-white text-primary font-bold hover:bg-white/90 shadow-md"
+                className="h-12 px-6 rounded-xl bg-yellow-400 text-gray-900 font-bold hover:bg-yellow-300 shadow-lg border-2 border-yellow-300"
                 data-testid="button-create-magic"
               >
+                <Sparkles className="h-4 w-4 mr-1" />
                 {t('home.hero.button')}
               </Button>
             </div>

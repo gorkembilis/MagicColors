@@ -4,17 +4,17 @@ import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n";
 
 export function BottomNav() {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const { t } = useI18n();
 
-  const isActive = (path: string) => {
-    return location === path || (path !== "/" && location.startsWith(path));
+  const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
+
+  const isHomeActive = () => {
+    return location === "/" && !currentUrl.includes("tab=");
   };
 
   const isColoringActive = () => {
-    const isHomeColoring = (location === "/" || location.startsWith("/?")) && !location.includes("tab=puzzle");
-    return isHomeColoring ||
-           location.includes("tab=coloring") ||
+    return currentUrl.includes("tab=coloring") ||
            location.startsWith("/pack") || 
            location.startsWith("/view") || 
            location.startsWith("/coloring") ||
@@ -22,61 +22,77 @@ export function BottomNav() {
   };
 
   const isPuzzleActive = () => {
-    return location.includes("tab=puzzle") || location.startsWith("/puzzle");
+    return currentUrl.includes("tab=puzzle") || location.startsWith("/puzzle");
   };
 
-  return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 border-t bg-white/90 backdrop-blur-lg pb-safe shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-      <div className="flex h-16 items-center justify-around px-2">
-        <Link
-          href="/"
-          className={cn(
-            "flex flex-col items-center justify-center gap-1 p-2 transition-colors",
-            isActive("/") && location === "/" ? "text-primary" : "text-muted-foreground hover:text-primary/70"
-          )}
-          data-testid="nav-home"
-        >
-          <Home className={cn("h-6 w-6", isActive("/") && location === "/" && "fill-current")} />
-          <span className="text-[10px] font-bold">{t('nav.home')}</span>
-        </Link>
+  const isProfileActive = () => {
+    return location === "/profile" || location.startsWith("/profile");
+  };
 
-        <Link
-          href="/?tab=coloring"
-          className={cn(
-            "flex flex-col items-center justify-center gap-1 p-2 transition-colors",
-            isColoringActive() ? "text-primary" : "text-muted-foreground hover:text-primary/70"
-          )}
-          data-testid="nav-coloring"
-        >
-          <Palette className={cn("h-6 w-6", isColoringActive() && "fill-current")} />
-          <span className="text-[10px] font-bold">{t('nav.coloring')}</span>
-        </Link>
+  const navigateTo = (path: string) => {
+    window.location.href = path;
+  };
 
-        <Link
-          href="/?tab=puzzle"
-          className={cn(
-            "flex flex-col items-center justify-center gap-1 p-2 transition-colors",
-            isPuzzleActive() ? "text-primary" : "text-muted-foreground hover:text-primary/70"
-          )}
-          data-testid="nav-puzzles"
-        >
-          <Puzzle className={cn("h-6 w-6", isPuzzleActive() && "fill-current")} />
-          <span className="text-[10px] font-bold">{t('nav.puzzles')}</span>
-        </Link>
-
-        <Link
-          href="/profile"
-          className={cn(
-            "flex flex-col items-center justify-center gap-1 p-2 transition-colors",
-            isActive("/profile") ? "text-primary" : "text-muted-foreground hover:text-primary/70"
-          )}
-          data-testid="nav-profile"
-        >
-          <User className={cn("h-6 w-6", isActive("/profile") && "fill-current")} />
-          <span className="text-[10px] font-bold">{t('nav.profile')}</span>
-        </Link>
+  const NavItem = ({ active, icon: Icon, label, onClick, testId }: {
+    active: boolean;
+    icon: typeof Home;
+    label: string;
+    onClick: () => void;
+    testId: string;
+  }) => (
+    <button
+      onClick={onClick}
+      className={cn(
+        "flex flex-col items-center justify-center gap-0.5 p-2 transition-all relative min-w-[60px]",
+        active ? "text-primary" : "text-gray-400 hover:text-primary/70"
+      )}
+      data-testid={testId}
+    >
+      {active && (
+        <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-8 h-1 bg-primary rounded-full" />
+      )}
+      <div className={cn(
+        "p-1.5 rounded-xl transition-all",
+        active ? "bg-primary/10" : ""
+      )}>
+        <Icon className={cn("h-6 w-6", active && "fill-primary/20")} />
       </div>
-      {/* iPhone Home Indicator Spacer */}
+      <span className={cn("text-[10px] font-bold", active && "text-primary")}>{label}</span>
+    </button>
+  );
+
+  return (
+    <div className="fixed bottom-0 left-0 right-0 z-50 border-t bg-white/95 backdrop-blur-lg pb-safe shadow-[0_-4px_12px_-1px_rgba(0,0,0,0.1)]">
+      <div className="flex h-16 items-center justify-around px-2">
+        <NavItem 
+          active={isHomeActive()}
+          icon={Home}
+          label={t('nav.home')}
+          onClick={() => navigateTo('/')}
+          testId="nav-home"
+        />
+        <NavItem 
+          active={isColoringActive()}
+          icon={Palette}
+          label={t('nav.coloring')}
+          onClick={() => navigateTo('/?tab=coloring')}
+          testId="nav-coloring"
+        />
+        <NavItem 
+          active={isPuzzleActive()}
+          icon={Puzzle}
+          label={t('nav.puzzles')}
+          onClick={() => navigateTo('/?tab=puzzle')}
+          testId="nav-puzzles"
+        />
+        <NavItem 
+          active={isProfileActive()}
+          icon={User}
+          label={t('nav.profile')}
+          onClick={() => setLocation('/profile')}
+          testId="nav-profile"
+        />
+      </div>
       <div className="h-safe-bottom w-full bg-transparent" /> 
     </div>
   );
