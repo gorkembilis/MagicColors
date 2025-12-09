@@ -2,19 +2,24 @@ import { Link, useLocation } from "wouter";
 import { Home, Palette, Puzzle, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n";
+import { useState, useEffect } from "react";
 
 export function BottomNav() {
   const [location, setLocation] = useLocation();
   const { t } = useI18n();
+  const [currentTab, setCurrentTab] = useState<string | null>(null);
 
-  const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setCurrentTab(params.get('tab'));
+  }, [location]);
 
   const isHomeActive = () => {
-    return location === "/" && !currentUrl.includes("tab=");
+    return location === "/" && !currentTab;
   };
 
   const isColoringActive = () => {
-    return currentUrl.includes("tab=coloring") ||
+    return currentTab === "coloring" ||
            location.startsWith("/pack") || 
            location.startsWith("/view") || 
            location.startsWith("/coloring") ||
@@ -22,15 +27,24 @@ export function BottomNav() {
   };
 
   const isPuzzleActive = () => {
-    return currentUrl.includes("tab=puzzle") || location.startsWith("/puzzle");
+    return currentTab === "puzzle" || location.startsWith("/puzzle");
   };
 
   const isProfileActive = () => {
     return location === "/profile" || location.startsWith("/profile");
   };
 
-  const navigateTo = (path: string) => {
-    window.location.href = path;
+  const handleNavigation = (path: string) => {
+    if (path.includes('?')) {
+      const [basePath, queryString] = path.split('?');
+      setLocation(basePath);
+      window.history.replaceState({}, '', path);
+      const params = new URLSearchParams(queryString);
+      setCurrentTab(params.get('tab'));
+    } else {
+      setLocation(path);
+      setCurrentTab(null);
+    }
   };
 
   const NavItem = ({ active, icon: Icon, label, onClick, testId }: {
@@ -68,28 +82,28 @@ export function BottomNav() {
           active={isHomeActive()}
           icon={Home}
           label={t('nav.home')}
-          onClick={() => navigateTo('/')}
+          onClick={() => handleNavigation('/')}
           testId="nav-home"
         />
         <NavItem 
           active={isColoringActive()}
           icon={Palette}
           label={t('nav.coloring')}
-          onClick={() => navigateTo('/?tab=coloring')}
+          onClick={() => handleNavigation('/?tab=coloring')}
           testId="nav-coloring"
         />
         <NavItem 
           active={isPuzzleActive()}
           icon={Puzzle}
           label={t('nav.puzzles')}
-          onClick={() => navigateTo('/?tab=puzzle')}
+          onClick={() => handleNavigation('/?tab=puzzle')}
           testId="nav-puzzles"
         />
         <NavItem 
           active={isProfileActive()}
           icon={User}
           label={t('nav.profile')}
-          onClick={() => setLocation('/profile')}
+          onClick={() => handleNavigation('/profile')}
           testId="nav-profile"
         />
       </div>

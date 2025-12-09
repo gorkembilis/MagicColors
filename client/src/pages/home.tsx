@@ -230,7 +230,7 @@ export default function Home() {
               </div>
               <div>
                 <h3 className="font-bold text-lg">{t('home.hero.magicTitle') || 'Sihir Yarat'}</h3>
-                <p className="text-white/80 text-xs">{t('home.hero.subtitle') || 'AI ile boyama sayfası oluştur'}</p>
+                <p className="text-white/80 text-xs">{t('home.hero.aiSubtitle')}</p>
               </div>
               <Sparkles className="h-6 w-6 ml-auto text-yellow-300 animate-pulse" />
             </div>

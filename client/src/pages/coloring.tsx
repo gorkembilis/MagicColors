@@ -246,25 +246,36 @@ export default function Coloring() {
 
   const downloadImage = () => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas || !image) return;
 
-    const scaleFactor = 4;
+    const scaleFactor = 3;
     const highResCanvas = document.createElement("canvas");
-    highResCanvas.width = canvas.width * scaleFactor;
-    highResCanvas.height = canvas.height * scaleFactor;
-    
-    const highResCtx = highResCanvas.getContext("2d");
+    const highResCtx = highResCanvas.getContext("2d", { willReadFrequently: true });
     if (!highResCtx) return;
-    
-    highResCtx.imageSmoothingEnabled = true;
-    highResCtx.imageSmoothingQuality = "high";
-    highResCtx.scale(scaleFactor, scaleFactor);
-    highResCtx.drawImage(canvas, 0, 0);
 
-    const link = document.createElement("a");
-    link.download = `magiccolors-${imageId}.png`;
-    link.href = highResCanvas.toDataURL("image/png", 1.0);
-    link.click();
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const targetWidth = Math.min(img.width * scaleFactor, 4096);
+      const targetHeight = Math.min(img.height * scaleFactor, 4096);
+      
+      highResCanvas.width = targetWidth;
+      highResCanvas.height = targetHeight;
+      
+      highResCtx.imageSmoothingEnabled = true;
+      highResCtx.imageSmoothingQuality = "high";
+      
+      highResCtx.fillStyle = "#FFFFFF";
+      highResCtx.fillRect(0, 0, targetWidth, targetHeight);
+      
+      highResCtx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, targetWidth, targetHeight);
+
+      const link = document.createElement("a");
+      link.download = `magiccolors-${imageId}.png`;
+      link.href = highResCanvas.toDataURL("image/png", 1.0);
+      link.click();
+    };
+    img.src = image.url;
   };
 
   const handleFinish = () => {
