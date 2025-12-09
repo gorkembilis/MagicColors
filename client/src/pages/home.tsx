@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { packs, Difficulty } from "@/lib/mock-data";
+import { puzzlePacks } from "@/lib/puzzle-data";
 import { Wand2, Lock, ArrowRight, Globe, Trophy, Sparkles, Palette, Download, Share2, ChevronLeft, ChevronRight, Search, X, Puzzle } from "lucide-react";
 import { Link, useLocation } from "wouter";
 
@@ -17,9 +18,10 @@ import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 
 type DifficultyFilter = 'all' | Difficulty;
+type TabType = 'coloring' | 'puzzle';
 
 export default function Home() {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const [prompt, setPrompt] = useState("");
   const [difficultyFilter, setDifficultyFilter] = useState<DifficultyFilter>('all');
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -27,6 +29,16 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const { t, language, setLanguage } = useI18n();
   const { user } = useAuth();
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const tabParam = urlParams.get('tab') as TabType | null;
+  const [activeTab, setActiveTab] = useState<TabType>(tabParam === 'puzzle' ? 'puzzle' : 'coloring');
+
+  const handleTabChange = (tab: TabType) => {
+    setActiveTab(tab);
+    const newUrl = tab === 'coloring' ? '/' : '/?tab=puzzle';
+    window.history.replaceState({}, '', newUrl);
+  };
 
   const slides = [
     {
@@ -76,6 +88,13 @@ export default function Home() {
     return matchesDifficulty && matchesSearch;
   });
 
+  const filteredPuzzlePacks = puzzlePacks.filter(p => {
+    const matchesDifficulty = difficultyFilter === 'all' || p.difficulty === difficultyFilter;
+    const packName = p.id.toLowerCase();
+    const matchesSearch = searchQuery === "" || packName.includes(searchQuery.toLowerCase());
+    return matchesDifficulty && matchesSearch;
+  });
+
   const difficultyColors: Record<Difficulty, string> = {
     easy: "bg-green-100 text-green-700 border-green-200",
     medium: "bg-yellow-100 text-yellow-700 border-yellow-200",
@@ -117,7 +136,7 @@ export default function Home() {
       }
     >
       {/* Hero Slider Section */}
-      <section className="relative overflow-hidden px-4 pt-6 pb-6">
+      <section className="relative overflow-hidden px-4 pt-6 pb-4">
         <div className="relative">
           {/* Slider */}
           <div className="relative rounded-3xl overflow-hidden shadow-lg">
@@ -131,7 +150,7 @@ export default function Home() {
                 className="relative"
               >
                 {/* Background Image */}
-                <div className="relative h-48 overflow-hidden">
+                <div className="relative h-40 overflow-hidden">
                   <img 
                     src={slides[currentSlide].image} 
                     alt={slides[currentSlide].title}
@@ -192,96 +211,84 @@ export default function Home() {
               ))}
             </div>
           </div>
+        </div>
+      </section>
 
-          {/* AI Generator Input */}
-          <motion.form 
-            onSubmit={handleGenerate}
-            className="relative mx-auto max-w-md mt-4"
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-          >
-            <div className="relative flex gap-2">
-              <div className="relative flex-1">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                  <Wand2 className="h-4 w-4" />
-                </div>
-                <Input 
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  placeholder={t('home.hero.placeholder')}
-                  className="h-12 rounded-xl border-2 border-border bg-white pl-10 pr-4 text-sm shadow-sm transition-all focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20"
-                />
-              </div>
+      {/* AI Generator - Sihir Yarat */}
+      <section className="px-4 pb-4">
+        <motion.form 
+          onSubmit={handleGenerate}
+          className="relative mx-auto"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+        >
+          <div className="bg-gradient-to-r from-purple-500 to-primary rounded-2xl p-4 text-white">
+            <div className="flex items-center gap-2 mb-3">
+              <Wand2 className="h-5 w-5" />
+              <span className="font-bold">{t('home.hero.magicTitle') || 'Sihir Yarat'}</span>
+            </div>
+            <div className="flex gap-2">
+              <Input 
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                placeholder={t('home.hero.placeholder')}
+                className="h-11 rounded-xl border-none bg-white/90 text-gray-800 placeholder:text-gray-500 text-sm"
+                data-testid="input-magic-prompt"
+              />
               <Button 
                 type="submit" 
                 size="lg" 
-                className="h-12 px-6 rounded-xl bg-primary font-bold hover:bg-primary/90 shadow-md"
+                className="h-11 px-5 rounded-xl bg-white text-primary font-bold hover:bg-white/90 shadow-md"
+                data-testid="button-create-magic"
               >
                 {t('home.hero.button')}
               </Button>
             </div>
-          </motion.form>
+          </div>
+        </motion.form>
+      </section>
+
+      {/* Tab Navigation */}
+      <section className="px-4 pb-2">
+        <div className="flex bg-gray-100 rounded-2xl p-1">
+          <button
+            onClick={() => handleTabChange('coloring')}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm transition-all ${
+              activeTab === 'coloring' 
+                ? 'bg-white text-primary shadow-sm' 
+                : 'text-gray-500'
+            }`}
+            data-testid="tab-coloring"
+          >
+            <Palette className="h-5 w-5" />
+            {t('nav.coloring')}
+          </button>
+          <button
+            onClick={() => handleTabChange('puzzle')}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm transition-all ${
+              activeTab === 'puzzle' 
+                ? 'bg-white text-primary shadow-sm' 
+                : 'text-gray-500'
+            }`}
+            data-testid="tab-puzzle"
+          >
+            <Puzzle className="h-5 w-5" />
+            {t('nav.puzzles')}
+          </button>
         </div>
-      </section>
-
-      {/* Contest Banner */}
-      <section className="px-4 pb-4">
-        <Link href="/contests">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-gradient-to-r from-purple-500 to-primary rounded-2xl p-4 text-white cursor-pointer hover:shadow-lg transition-shadow"
-            data-testid="banner-contest"
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-full bg-white/20">
-                  <Trophy className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="font-bold">{t("contest.weeklyContest")}</h3>
-                  <p className="text-sm opacity-90">{t("contest.joinNow")}</p>
-                </div>
-              </div>
-              <ArrowRight className="h-5 w-5" />
-            </div>
-          </motion.div>
-        </Link>
-      </section>
-
-      {/* Puzzle Banner */}
-      <section className="px-4 pb-4">
-        <Link href="/puzzles">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.1 }}
-            className="bg-gradient-to-r from-indigo-500 to-cyan-500 rounded-2xl p-4 text-white cursor-pointer hover:shadow-lg transition-shadow"
-            data-testid="banner-puzzle"
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-full bg-white/20">
-                  <Puzzle className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="font-bold">{t("nav.puzzles")}</h3>
-                  <p className="text-sm opacity-90">{t("puzzle.createFromImage")}</p>
-                </div>
-              </div>
-              <ArrowRight className="h-5 w-5" />
-            </div>
-          </motion.div>
-        </Link>
       </section>
 
       {/* Packs Section */}
       <section className="px-4 pb-8">
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold">{t('home.packs.title')}</h2>
-            <p className="text-xs text-muted-foreground">{t('home.packs.subtitle')}</p>
+            <h2 className="text-xl font-bold">
+              {activeTab === 'coloring' ? t('home.packs.title') : t('nav.puzzles')}
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              {activeTab === 'coloring' ? t('home.packs.subtitle') : t('puzzle.subtitle') || 'Eğlenceli puzzle oyunları'}
+            </p>
           </div>
           <Button variant="ghost" size="sm" className="h-8 text-xs font-bold text-primary px-2">
             {t('home.packs.viewAll')} <ArrowRight className="ml-1 h-3 w-3" />
@@ -347,51 +354,105 @@ export default function Home() {
           )}
         </div>
 
-        <motion.div 
-          variants={container}
-          initial="hidden"
-          animate="show"
-          className="grid grid-cols-2 gap-3"
-        >
-          {filteredPacks.map((pack) => (
-            <motion.div key={pack.id} variants={item}>
-              <Link href={`/pack/${pack.id}`}>
-                <Card className="group cursor-pointer overflow-hidden border-none shadow-sm transition-all hover:-translate-y-1 hover:shadow-md bg-white active:scale-95 duration-100">
-                  <div className="relative aspect-square overflow-hidden rounded-t-xl">
-                    <img 
-                      src={pack.cover} 
-                      alt={pack.title}
-                      className="h-full w-full object-cover"
-                    />
-                    {pack.isPremium && !user?.isPremium && (
-                      <div className="absolute right-2 top-2 rounded-full bg-black/60 p-1.5 text-secondary backdrop-blur-sm">
-                        <Lock className="h-3 w-3" />
+        {/* Coloring Packs */}
+        {activeTab === 'coloring' && (
+          <motion.div 
+            variants={container}
+            initial="hidden"
+            animate="show"
+            className="grid grid-cols-2 gap-3"
+          >
+            {filteredPacks.map((pack) => (
+              <motion.div key={pack.id} variants={item}>
+                <Link href={`/pack/${pack.id}`}>
+                  <Card className="group cursor-pointer overflow-hidden border-none shadow-sm transition-all hover:-translate-y-1 hover:shadow-md bg-white active:scale-95 duration-100">
+                    <div className="relative aspect-square overflow-hidden rounded-t-xl">
+                      <img 
+                        src={pack.cover} 
+                        alt={pack.title}
+                        className="h-full w-full object-cover"
+                      />
+                      {pack.isPremium && !user?.isPremium && (
+                        <div className="absolute right-2 top-2 rounded-full bg-black/60 p-1.5 text-secondary backdrop-blur-sm">
+                          <Lock className="h-3 w-3" />
+                        </div>
+                      )}
+                      {pack.isPremium && user?.isPremium && (
+                        <div className="absolute right-2 top-2 rounded-full bg-gradient-to-r from-yellow-500 to-orange-500 px-2 py-0.5 text-[10px] font-bold text-white shadow-lg border border-white">
+                          Premium
+                        </div>
+                      )}
+                      {!pack.isPremium && (
+                        <div className="absolute right-2 top-2 rounded-full bg-green-500 px-2 py-0.5 text-[10px] font-bold text-white shadow-lg border border-white animate-pulse">
+                          {t('home.packs.free')}
+                        </div>
+                      )}
+                      {/* Difficulty Badge */}
+                      <div className={`absolute left-2 top-2 rounded-full px-2 py-0.5 text-[10px] font-bold border ${difficultyColors[pack.difficulty]}`}>
+                        {t(`difficulty.${pack.difficulty}`)}
                       </div>
-                    )}
-                    {pack.isPremium && user?.isPremium && (
-                      <div className="absolute right-2 top-2 rounded-full bg-gradient-to-r from-yellow-500 to-orange-500 px-2 py-0.5 text-[10px] font-bold text-white shadow-lg border border-white">
-                        Premium
-                      </div>
-                    )}
-                    {!pack.isPremium && (
-                      <div className="absolute right-2 top-2 rounded-full bg-green-500 px-2 py-0.5 text-[10px] font-bold text-white shadow-lg border border-white animate-pulse">
-                        {t('home.packs.free')}
-                      </div>
-                    )}
-                    {/* Difficulty Badge */}
-                    <div className={`absolute left-2 top-2 rounded-full px-2 py-0.5 text-[10px] font-bold border ${difficultyColors[pack.difficulty]}`}>
-                      {t(`difficulty.${pack.difficulty}`)}
                     </div>
-                  </div>
-                  <CardContent className="p-3">
-                    <h3 className="mb-0.5 text-sm font-bold leading-none truncate">{t(`pack.${pack.id}`)}</h3>
-                    <p className="text-[10px] text-muted-foreground">{pack.count} {t('home.packs.pages')}</p>
-                  </CardContent>
-                </Card>
-              </Link>
-            </motion.div>
-          ))}
-        </motion.div>
+                    <CardContent className="p-3">
+                      <h3 className="mb-0.5 text-sm font-bold leading-none truncate">{t(`pack.${pack.id}`)}</h3>
+                      <p className="text-[10px] text-muted-foreground">{pack.count} {t('home.packs.pages')}</p>
+                    </CardContent>
+                  </Card>
+                </Link>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+
+        {/* Puzzle Packs */}
+        {activeTab === 'puzzle' && (
+          <motion.div 
+            variants={container}
+            initial="hidden"
+            animate="show"
+            className="grid grid-cols-2 gap-3"
+          >
+            {filteredPuzzlePacks.map((pack) => (
+              <motion.div key={pack.id} variants={item}>
+                <Link href={`/puzzle-pack/${pack.id}`}>
+                  <Card className="group cursor-pointer overflow-hidden border-none shadow-sm transition-all hover:-translate-y-1 hover:shadow-md bg-white active:scale-95 duration-100">
+                    <div className="relative aspect-square overflow-hidden rounded-t-xl">
+                      <img 
+                        src={pack.cover} 
+                        alt={pack.id}
+                        className="h-full w-full object-cover"
+                      />
+                      {pack.isPremium && !user?.isPremium && (
+                        <div className="absolute right-2 top-2 rounded-full bg-black/60 p-1.5 text-secondary backdrop-blur-sm">
+                          <Lock className="h-3 w-3" />
+                        </div>
+                      )}
+                      {pack.isPremium && user?.isPremium && (
+                        <div className="absolute right-2 top-2 rounded-full bg-gradient-to-r from-yellow-500 to-orange-500 px-2 py-0.5 text-[10px] font-bold text-white shadow-lg border border-white">
+                          Premium
+                        </div>
+                      )}
+                      {!pack.isPremium && (
+                        <div className="absolute right-2 top-2 rounded-full bg-green-500 px-2 py-0.5 text-[10px] font-bold text-white shadow-lg border border-white animate-pulse">
+                          {t('home.packs.free')}
+                        </div>
+                      )}
+                      {/* Difficulty Badge */}
+                      <div className={`absolute left-2 top-2 rounded-full px-2 py-0.5 text-[10px] font-bold border ${difficultyColors[pack.difficulty]}`}>
+                        {t(`difficulty.${pack.difficulty}`)}
+                      </div>
+                    </div>
+                    <CardContent className="p-3">
+                      <h3 className="mb-0.5 text-sm font-bold leading-none truncate">
+                        {t(`puzzle.${pack.id}`) !== `puzzle.${pack.id}` ? t(`puzzle.${pack.id}`) : pack.id.replace('puzzle-', '').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      </h3>
+                      <p className="text-[10px] text-muted-foreground">{pack.count} puzzle</p>
+                    </CardContent>
+                  </Card>
+                </Link>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
       </section>
     </MobileLayout>
   );

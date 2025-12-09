@@ -33,6 +33,7 @@ const translations: Record<Language, Record<string, string>> = {
     "home.hero.subtitle": "Coloring Pages",
     "home.hero.placeholder": "Unicorn on the moon...",
     "home.hero.button": "Create Magic ✨",
+    "home.hero.magicTitle": "Create Magic",
 
     "slider.slide1.title": "AI-Powered Coloring Pages",
     "slider.slide1.desc": "Create unique coloring pages with AI! Just describe what you want and watch the magic happen.",
@@ -136,6 +137,7 @@ const translations: Record<Language, Record<string, string>> = {
     "auth.login": "Sign In",
 
     "coloring.title": "Color It!",
+    "coloring.tapToFill": "Tap on a region to fill with color",
     "coloring.notFound": "Image not found",
     "coloring.brushSize": "Brush",
     "coloring.download": "Download",
@@ -175,6 +177,9 @@ const translations: Record<Language, Record<string, string>> = {
     "profile.register": "Create Account",
     "profile.favorites": "My Favorites",
     "profile.favoritesEmpty": "No favorites yet. Tap the heart icon on any coloring page to save it here!",
+    "profile.magicWorld": "My Magic World",
+    "profile.magicWorldEmpty": "You haven't created any magic pages yet",
+    "profile.createMagic": "Create Magic",
     "profile.stats": "My Stats",
     "profile.totalColored": "Pages Colored",
     "profile.totalFavorites": "Favorites",
@@ -227,6 +232,7 @@ const translations: Record<Language, Record<string, string>> = {
     "contest.theme.nature": "Nature Wonders",
 
     "nav.puzzles": "Puzzles",
+    "puzzle.subtitle": "Fun puzzle games",
     "puzzle.title": "My Puzzles",
     "puzzle.empty": "No puzzles yet. Create your first puzzle from any coloring page!",
     "puzzle.createFromImage": "Create Puzzle",
@@ -298,6 +304,7 @@ const translations: Record<Language, Record<string, string>> = {
     "home.hero.subtitle": "Sayfanı Oluştur",
     "home.hero.placeholder": "Ayda dondurma yiyen kedi...",
     "home.hero.button": "Sihir Yarat ✨",
+    "home.hero.magicTitle": "Sihir Yarat",
 
     "slider.slide1.title": "AI ile Boyama Sayfası",
     "slider.slide1.desc": "AI ile benzersiz boyama sayfaları oluştur! Ne istediğini yaz ve sihri izle.",
@@ -401,6 +408,7 @@ const translations: Record<Language, Record<string, string>> = {
     "auth.login": "Giriş Yap",
 
     "coloring.title": "Boya!",
+    "coloring.tapToFill": "Boyamak için bölgeye dokun",
     "coloring.notFound": "Resim bulunamadı",
     "coloring.brushSize": "Fırça",
     "coloring.download": "İndir",
@@ -440,6 +448,9 @@ const translations: Record<Language, Record<string, string>> = {
     "profile.register": "Hesap Oluştur",
     "profile.favorites": "Favorilerim",
     "profile.favoritesEmpty": "Henüz favori yok. Kaydetmek için herhangi bir boyama sayfasındaki kalp simgesine dokun!",
+    "profile.magicWorld": "Sihirli Dünyam",
+    "profile.magicWorldEmpty": "Henüz sihirli bir sayfa oluşturmadınız",
+    "profile.createMagic": "Sihir Yarat",
     "profile.stats": "İstatistiklerim",
     "profile.totalColored": "Boyanan Sayfa",
     "profile.totalFavorites": "Favori",
@@ -492,6 +503,7 @@ const translations: Record<Language, Record<string, string>> = {
     "contest.theme.nature": "Doğa Harikaları",
 
     "nav.puzzles": "Puzzle",
+    "puzzle.subtitle": "Eğlenceli puzzle oyunları",
     "puzzle.title": "Puzzle'larım",
     "puzzle.empty": "Henüz puzzle yok. İlk puzzle'ını herhangi bir boyama sayfasından oluştur!",
     "puzzle.createFromImage": "Puzzle Oluştur",

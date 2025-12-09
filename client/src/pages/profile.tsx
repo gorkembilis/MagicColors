@@ -9,7 +9,7 @@ import { Link, useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { 
   User, Settings, LogOut, Heart, Palette, Award, 
-  ChevronRight, Crown, Star, Trophy, ImageIcon
+  ChevronRight, Crown, Star, Trophy, ImageIcon, Wand2, Sparkles
 } from "lucide-react";
 
 interface Favorite {
@@ -178,6 +178,57 @@ export default function Profile() {
           </Card>
         </motion.div>
 
+        {/* Sihirli Dünyam - AI Generated Images */}
+        <motion.div variants={item}>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-lg font-bold flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-purple-500" />
+              {t("profile.magicWorld") || "Sihirli Dünyam"}
+            </h3>
+            {myArt.length > 0 && (
+              <Link href="/gallery" className="text-xs text-primary font-bold">
+                {t("profile.viewAll")} <ChevronRight className="inline w-3 h-3" />
+              </Link>
+            )}
+          </div>
+          
+          {myArt.length === 0 ? (
+            <Card className="border-dashed border-purple-200 bg-purple-50/50">
+              <CardContent className="py-8 text-center">
+                <Wand2 className="w-10 h-10 text-purple-300 mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground mb-3">
+                  {t("profile.magicWorldEmpty") || "Henüz sihirli bir sayfa oluşturmadınız"}
+                </p>
+                <Link href="/">
+                  <Button size="sm" className="bg-purple-500 hover:bg-purple-600">
+                    <Wand2 className="w-4 h-4 mr-1" />
+                    {t("profile.createMagic") || "Sihir Yarat"}
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-4 gap-2">
+              {myArt.slice(0, 4).map((art: any) => (
+                <Link key={art.id} href={`/view/ai-${art.id}`}>
+                  <div className="aspect-square rounded-lg overflow-hidden bg-muted relative">
+                    <img 
+                      src={art.imageUrl} 
+                      alt={art.prompt || "AI Generated"} 
+                      className="w-full h-full object-cover"
+                      data-testid={`magic-image-${art.id}`}
+                    />
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-purple-600/80 to-transparent p-1">
+                      <Sparkles className="w-3 h-3 text-white" />
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </motion.div>
+
+        {/* Favorites */}
         <motion.div variants={item}>
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-lg font-bold flex items-center gap-2">

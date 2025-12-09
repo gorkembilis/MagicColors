@@ -12,14 +12,17 @@ export function BottomNav() {
   };
 
   const isColoringActive = () => {
-    return location === "/generate" || 
+    const isHomeColoring = (location === "/" || location.startsWith("/?")) && !location.includes("tab=puzzle");
+    return isHomeColoring ||
+           location.includes("tab=coloring") ||
            location.startsWith("/pack") || 
            location.startsWith("/view") || 
-           location.startsWith("/coloring");
+           location.startsWith("/coloring") ||
+           location.startsWith("/generate");
   };
 
   const isPuzzleActive = () => {
-    return location.startsWith("/puzzle");
+    return location.includes("tab=puzzle") || location.startsWith("/puzzle");
   };
 
   return (
@@ -38,7 +41,7 @@ export function BottomNav() {
         </Link>
 
         <Link
-          href="/generate"
+          href="/?tab=coloring"
           className={cn(
             "flex flex-col items-center justify-center gap-1 p-2 transition-colors",
             isColoringActive() ? "text-primary" : "text-muted-foreground hover:text-primary/70"
@@ -50,7 +53,7 @@ export function BottomNav() {
         </Link>
 
         <Link
-          href="/puzzles"
+          href="/?tab=puzzle"
           className={cn(
             "flex flex-col items-center justify-center gap-1 p-2 transition-colors",
             isPuzzleActive() ? "text-primary" : "text-muted-foreground hover:text-primary/70"
