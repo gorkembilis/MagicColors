@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { packs, Difficulty } from "@/lib/mock-data";
 import { puzzlePacks } from "@/lib/puzzle-data";
-import { Wand2, Lock, ArrowRight, Globe, Trophy, Sparkles, Palette, Download, Share2, ChevronLeft, ChevronRight, Search, X, Puzzle } from "lucide-react";
+import { Wand2, Lock, ArrowRight, Globe, Trophy, Sparkles, Palette, Download, Share2, ChevronLeft, ChevronRight, Search, X, Puzzle, Camera, GraduationCap, Hash, Type } from "lucide-react";
 import { Link, useLocation } from "wouter";
 
 import sliderImg1 from "@assets/generated_images/child_coloring_with_magic.png";
@@ -467,6 +467,68 @@ export default function Home() {
             ))}
           </motion.div>
         )}
+      </section>
+
+      {/* Educational Features Section */}
+      <section className="px-4 pb-8">
+        <div className="mb-4">
+          <h2 className="text-xl font-bold">{t('home.educational.title')}</h2>
+          <p className="text-xs text-muted-foreground">{t('home.educational.subtitle')}</p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <Link href="/photo-to-coloring">
+            <motion.div 
+              whileTap={{ scale: 0.95 }}
+              className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl p-4 text-white cursor-pointer"
+            >
+              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center mb-3">
+                <Camera className="h-5 w-5" />
+              </div>
+              <h3 className="font-bold text-sm">{t('edu.photoToColoring')}</h3>
+              <p className="text-[10px] text-white/80">{t('edu.photoToColoringDesc')}</p>
+            </motion.div>
+          </Link>
+
+          <Link href="/learn-colors">
+            <motion.div 
+              whileTap={{ scale: 0.95 }}
+              className="bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl p-4 text-white cursor-pointer"
+            >
+              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center mb-3">
+                <GraduationCap className="h-5 w-5" />
+              </div>
+              <h3 className="font-bold text-sm">{t('edu.learnColors')}</h3>
+              <p className="text-[10px] text-white/80">{t('edu.learnColorsDesc')}</p>
+            </motion.div>
+          </Link>
+
+          <Link href="/paint-by-numbers">
+            <motion.div 
+              whileTap={{ scale: 0.95 }}
+              className="bg-gradient-to-br from-blue-500 to-indigo-500 rounded-2xl p-4 text-white cursor-pointer"
+            >
+              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center mb-3">
+                <Hash className="h-5 w-5" />
+              </div>
+              <h3 className="font-bold text-sm">{t('edu.paintByNumbers')}</h3>
+              <p className="text-[10px] text-white/80">{t('edu.paintByNumbersDesc')}</p>
+            </motion.div>
+          </Link>
+
+          <Link href="/paint-by-alphabet">
+            <motion.div 
+              whileTap={{ scale: 0.95 }}
+              className="bg-gradient-to-br from-green-500 to-teal-500 rounded-2xl p-4 text-white cursor-pointer"
+            >
+              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center mb-3">
+                <Type className="h-5 w-5" />
+              </div>
+              <h3 className="font-bold text-sm">{t('edu.paintByAlphabet')}</h3>
+              <p className="text-[10px] text-white/80">{t('edu.paintByAlphabetDesc')}</p>
+            </motion.div>
+          </Link>
+        </div>
       </section>
     </MobileLayout>
   );

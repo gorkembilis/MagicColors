@@ -22,6 +22,10 @@ import Admin from "@/pages/admin";
 import Puzzles from "@/pages/puzzles";
 import PuzzleGame from "@/pages/puzzle-game";
 import PuzzlePack from "@/pages/puzzle-pack";
+import PhotoToColoring from "@/pages/photo-to-coloring";
+import LearnColors from "@/pages/learn-colors";
+import PaintByNumbers from "@/pages/paint-by-numbers";
+import PaintByAlphabet from "@/pages/paint-by-alphabet";
 
 function OnboardingGuard() {
   const hasCompletedOnboarding = localStorage.getItem("magiccolors_onboarding_complete") === "true";
@@ -52,6 +56,10 @@ function Router() {
       <Route path="/puzzles" component={Puzzles}/>
       <Route path="/puzzle-pack/:id" component={PuzzlePack}/>
       <Route path="/puzzle/:id" component={PuzzleGame}/>
+      <Route path="/photo-to-coloring" component={PhotoToColoring}/>
+      <Route path="/learn-colors" component={LearnColors}/>
+      <Route path="/paint-by-numbers" component={PaintByNumbers}/>
+      <Route path="/paint-by-alphabet" component={PaintByAlphabet}/>
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>

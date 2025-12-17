@@ -62,3 +62,42 @@ export async function generateColorfulPuzzleImage(prompt: string): Promise<strin
   const mimeType = imagePart.inlineData.mimeType || "image/png";
   return `data:${mimeType};base64,${imagePart.inlineData.data}`;
 }
+
+export async function convertPhotoToLineArt(imageBase64: string): Promise<string> {
+  const fullPrompt = `Convert this photo into a simple, child-friendly black and white line-art coloring page.
+  The result should have:
+  - Clear, bold outlines suitable for coloring
+  - Simple shapes appropriate for children
+  - No shading or gradients, only black lines on white background
+  - Maintain the main subject and recognizable features
+  - Make it fun and engaging for kids to color`;
+
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash-image",
+    contents: [{ 
+      role: "user", 
+      parts: [
+        { 
+          inlineData: {
+            mimeType: "image/jpeg",
+            data: imageBase64.replace(/^data:image\/\w+;base64,/, '')
+          }
+        },
+        { text: fullPrompt }
+      ] 
+    }],
+    config: {
+      responseModalities: [Modality.TEXT, Modality.IMAGE],
+    },
+  });
+
+  const candidate = response.candidates?.[0];
+  const imagePart = candidate?.content?.parts?.find((part: any) => part.inlineData);
+
+  if (!imagePart?.inlineData?.data) {
+    throw new Error("No image data in response");
+  }
+
+  const mimeType = imagePart.inlineData.mimeType || "image/png";
+  return `data:${mimeType};base64,${imagePart.inlineData.data}`;
+}

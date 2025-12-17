@@ -2,7 +2,7 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./auth";
-import { generateColoringPage, generateColorfulPuzzleImage } from "./gemini";
+import { generateColoringPage, generateColorfulPuzzleImage, convertPhotoToLineArt } from "./gemini";
 
 const isAdmin = async (req: any, res: Response, next: NextFunction) => {
   if (!req.session?.userId) {
@@ -124,6 +124,38 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error deleting image:", error);
       res.status(500).json({ message: "Görsel silinemedi" });
+    }
+  });
+
+  app.post("/api/photo-to-coloring", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.guestMode ? null : req.session.userId;
+      const { imageData } = req.body;
+
+      if (!imageData || typeof imageData !== "string") {
+        return res.status(400).json({ message: "Fotoğraf verisi gerekli" });
+      }
+
+      const lineArtUrl = await convertPhotoToLineArt(imageData);
+
+      if (userId) {
+        const image = await storage.createGeneratedImage({
+          userId,
+          prompt: "Fotoğraftan boyama",
+          imageUrl: lineArtUrl,
+        });
+        res.json(image);
+      } else {
+        res.json({
+          id: Date.now(),
+          prompt: "Fotoğraftan boyama",
+          imageUrl: lineArtUrl,
+          createdAt: new Date().toISOString(),
+        });
+      }
+    } catch (error) {
+      console.error("Error converting photo:", error);
+      res.status(500).json({ message: "Fotoğraf dönüştürülemedi" });
     }
   });
 

@@ -12,6 +12,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **Educational Features** (December 2024):
+  - **Photo-to-Coloring**: AI converts user photos to black-white line art for coloring (`/photo-to-coloring`)
+  - **Learn Colors**: Interactive color recognition game with levels for young children (`/learn-colors`)
+  - **Paint by Numbers**: Classic numbered coloring with number-to-color matching (`/paint-by-numbers`)
+  - **Paint by Alphabet**: Letter-based coloring with Turkish alphabet support (`/paint-by-alphabet`)
+  - Educational section on home page with colorful cards linking to each feature
+  - API endpoint `/api/photo-to-coloring` for photo conversion using Gemini AI
+  - Speech synthesis integration for pronouncing colors and letters (supports Turkish/English)
 - **Profile & Favorites System** (December 2024):
   - **Profile Page**: User profile at `/profile` with stats, achievements, and favorites gallery
   - **Favorites System**: Heart button to save favorite coloring pages to user profile
@@ -83,6 +91,10 @@ Preferred communication style: Simple, everyday language.
 - `/settings` - Notification preferences and language settings
 - `/premium` - Premium tier upsell page
 - `/mc-management-2024` - Admin dashboard (secret URL, requires admin role, not linked from main app)
+- `/photo-to-coloring` - AI-powered photo to line art converter
+- `/learn-colors` - Interactive color learning game for children
+- `/paint-by-numbers` - Classic paint by numbers activity
+- `/paint-by-alphabet` - Paint by alphabet activity with Turkish support
 
 ### Backend Architecture
 
