@@ -3,6 +3,7 @@ import { useRoute, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
 import { useSound } from "@/lib/sounds";
+import { useAuth } from "@/hooks/useAuth";
 import { CelebrationModal } from "@/components/Confetti";
 import { ArrowLeft, Undo2, Download, Share2, Trash2, Check, Droplet } from "lucide-react";
 import { packs } from "@/lib/mock-data";
@@ -19,6 +20,7 @@ export default function Coloring() {
   const [, params] = useRoute("/coloring/:id");
   const [, setLocation] = useLocation();
   const { t } = useI18n();
+  const { user } = useAuth();
   const { playColorSelect, playCelebration, playClick } = useSound();
   
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -244,6 +246,20 @@ export default function Coloring() {
     });
   };
 
+  const addSignature = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
+    const userName = user?.firstName || "";
+    if (!userName) return;
+    
+    const fontSize = Math.max(Math.floor(height * 0.04), 16);
+    ctx.font = `italic ${fontSize}px 'Brush Script MT', 'Segoe Script', 'Bradley Hand', cursive`;
+    ctx.fillStyle = "rgba(100, 100, 100, 0.7)";
+    ctx.textAlign = "right";
+    ctx.textBaseline = "bottom";
+    
+    const padding = Math.floor(width * 0.03);
+    ctx.fillText(userName, width - padding, height - padding);
+  };
+
   const downloadImage = () => {
     const canvas = canvasRef.current;
     if (!canvas || !image) return;
@@ -269,6 +285,8 @@ export default function Coloring() {
       highResCtx.fillRect(0, 0, targetWidth, targetHeight);
       
       highResCtx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, targetWidth, targetHeight);
+      
+      addSignature(highResCtx, targetWidth, targetHeight);
 
       const link = document.createElement("a");
       link.download = `magiccolors-${imageId}.png`;
@@ -288,8 +306,17 @@ export default function Coloring() {
     if (!canvas) return;
 
     try {
+      const shareCanvas = document.createElement("canvas");
+      shareCanvas.width = canvas.width;
+      shareCanvas.height = canvas.height;
+      const shareCtx = shareCanvas.getContext("2d");
+      if (!shareCtx) return;
+      
+      shareCtx.drawImage(canvas, 0, 0);
+      addSignature(shareCtx, canvas.width, canvas.height);
+
       const blob = await new Promise<Blob>((resolve) => {
-        canvas.toBlob((b) => resolve(b!), "image/png");
+        shareCanvas.toBlob((b) => resolve(b!), "image/png");
       });
 
       if (navigator.share && navigator.canShare({ files: [new File([blob], "test.png", { type: "image/png" })] })) {
