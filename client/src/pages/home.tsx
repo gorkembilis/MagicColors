@@ -30,14 +30,21 @@ export default function Home() {
   const { t, language, setLanguage } = useI18n();
   const { user } = useAuth();
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const tabParam = urlParams.get('tab') as TabType | null;
-  const [activeTab, setActiveTab] = useState<TabType>(tabParam === 'puzzle' ? 'puzzle' : 'coloring');
+  const getTabFromUrl = () => {
+    if (typeof window === 'undefined') return 'coloring';
+    const tab = new URLSearchParams(window.location.search).get('tab');
+    return tab === 'puzzle' ? 'puzzle' : 'coloring';
+  };
+  
+  const [activeTab, setActiveTab] = useState<TabType>(getTabFromUrl());
+
+  useEffect(() => {
+    setActiveTab(getTabFromUrl());
+  }, [location]);
 
   const handleTabChange = (tab: TabType) => {
-    setActiveTab(tab);
-    const newUrl = tab === 'coloring' ? '/' : '/?tab=puzzle';
-    window.history.replaceState({}, '', newUrl);
+    const newUrl = tab === 'puzzle' ? '/?tab=puzzle' : '/?tab=coloring';
+    window.location.href = newUrl;
   };
 
   const slides = [
